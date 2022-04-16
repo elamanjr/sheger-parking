@@ -1,0 +1,27 @@
+.well{background-color: white;
+    /* min-width: inherit; */
+    /* padding: auto; */
+    /* width: 100%; */
+    margin-top: 10px;
+    border-radius: 5px;
+    
+    overflow-wrap: wrap;
+    padding: 20px 0px 10px 10px;
+}
+
+
+.wellContainer{
+    padding: auto;
+    /* border: 1px solid; */
+}
+
+@media screen and (max-width: 767px) {
+    .row.content {height: auto;} 
+  }
+
+body{
+    min-width: 550px;
+}
+
+.wellContainerBox{
+flex-wrap: wrap;}
