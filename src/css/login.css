@@ -1,0 +1,40 @@
+/* .register-form {align-self: center;
+} */
+
+body{ 
+    padding: 60px 50px;
+    margin-top: auto;
+    margin-bottom: auto;
+    min-width: 600px;
+   }
+   
+   .container{
+    background-color: var(--on-surface);
+    padding-bottom: 10px;
+   }
+   .form-group{
+    padding-bottom: 5px;
+   }
+   .errorMessage{
+    color: red;
+   }
+   #login-form{
+       width: 400px;
+   /* padding-top: 100px; */
+   
+   }
+   .loginContainer{
+       background-color: #e7e7e7;
+       padding: 20px;
+       margin-top: 200px;
+       padding-right: 0px;
+       border-radius: 5px;
+       align-items: center;
+       width: 500px;
+   
+   }
+   #forgotPassword{
+       display: inline-flex;
+       flex-wrap: nowrap;
+       margin-left: 250px;
+   }

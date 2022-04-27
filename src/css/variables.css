@@ -1,0 +1,16 @@
+html {
+    /* --primary-color: #4EFFBF; */
+    --navbar-color: #e7e7e7;
+    --primary-color: #dadada;
+    --on-background: #222236;
+    --surface-color: #f0f0f0;
+
+    --secondary: #f0f0f0;
+    --on-surface: #f0f0f0;
+    --background: #FFFFFF;
+    --on-primary: #ffffff;
+    --danger: #da0000;
+    --goodIndication: #00be29;
+
+    --formFieldWidth:450px;
+}
