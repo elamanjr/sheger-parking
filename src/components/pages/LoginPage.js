@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '../Button';
 
 import '../../css/login.css';
@@ -6,6 +6,37 @@ import '../../css/common.css';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
+  const [phoneNo,setPhoneNo]=useState("")
+  const [password,setPassword]=useState("")
+  const token = "token:qwhu67fv56frt5drfx45e"
+
+  // useEffect(()=>{
+  //   if (localStorage.getItem('user-info')){
+  //     navigate('/user');
+  //   }
+  // },{})
+
+
+  function submitFunc(){
+    navigate('/user');
+    // let data={password,phoneNo}
+
+    // let result = await fetch(`http://127.0.0.1:5000/${token}/admins/login`
+    // // ,{
+    // //   method:"GET",
+    // //   headers: {
+    // //     "Content-Type": "application/json",
+    // //     "Accept" : "application/json"
+    // //   },
+    // //   // body: JSON.stringify(data)
+    // // }
+    // )
+
+    // result = await result.json();
+    // // localStorage.setItem(JSON.stringify(result))
+    // console.log(result)
+  }
+
   const navigate = useNavigate();
   return (
     <div className="container h-100">
@@ -16,7 +47,7 @@ export default function LoginPage() {
             id="login-form"
             onSubmit={(event) => {
               event.preventDefault();
-              navigate('/user');
+              submitFunc()
             }}
             action=""
             method=""
@@ -24,13 +55,14 @@ export default function LoginPage() {
             <h1 className="text-center">Login</h1>
 
             <div className="form-group">
-              <label for="username">Username:</label>
+              <label for="phoneNo">Username:</label>
               <input
                 type="text"
                 className="form-control username"
-                id="username"
-                placeholder="Username"
-                name="username"
+                id="phoneNo"
+                placeholder="Phone Number"
+                name="phoneNo"
+                onChange={(e)=>setPhoneNo(e.target.value)}
               />
               <div id="usernameError"></div>
             </div>
@@ -43,6 +75,7 @@ export default function LoginPage() {
                 id="password"
                 placeholder="Password"
                 name="password"
+                onChange={(e)=>setPassword(e.target.value)}
               />
               <div id="passwordError"></div>
             </div>

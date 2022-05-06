@@ -14,7 +14,8 @@ export default class Button extends Component {
       id: this.props.id,
       name: this.props.name,
       width : this.props.width,
-      class : this.props.className
+      class : this.props.className,
+      onclick: this.props.onclick
     };
   }
 
@@ -33,6 +34,7 @@ export default class Button extends Component {
         type={this.state.type}
         id={this.state.id}
         className={this.state.class}
+        onClick={this.state.onclick}
         
       >
         {this.state.name}

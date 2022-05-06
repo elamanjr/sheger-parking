@@ -1,28 +1,38 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
-import Button from '../Button'
-import { DeleteAdmin, EditAdmin, ShowAdmins, NewAdmin } from './adminActions'
-
-var adminList=[
-  {'id':'345','fullName':'abel tesfaye','phone':'0912935475','email':'abc@gmail.com','password':'********'}
-,{'id':'123','fullName':'yanet biruk','phone':'0912935475','email':'abc@gmail.com','password':'********'}
-,{'id':'123','fullName':'girma alem','phone':'0912935475','email':'abc@gmail.com','password':'********'}
-,{'id':'123','fullName':'robel tesfaye','phone':'0912935475','email':'abc@gmail.com','password':'********'}
-,{'id':'123','fullName':'girum abebe','phone':'0912935475','email':'abc@gmail.com','password':'********'}
-
-]
+import React, { useEffect, useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import { EditAdmin, ShowAdmins, NewAdmin } from './adminActions';
 
 export default function Admins() {
+
+  let [adminList, setAdminList] = useState([]);
+
+  async function FetchAdmins() {
+    useEffect(() => {
+    fetch(
+      'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins',
+      {
+        method: 'GET',
+      }
+    )
+      .then((response) => response.json())
+      .then((resp) => setAdminList(resp));
+    }, [])
+
+  }
+
+  FetchAdmins();
+
+  setInterval(() => {
+    FetchAdmins()
+  }, 60000);
+
   
+
   return (
     <Routes>
-        <Route exact path="/" element={<ShowAdmins adminList={adminList}/>} />
-        <Route path="/edit/" element={<EditAdmin/>} />
-        <Route path="/delete/" element={<DeleteAdmin/>} />
-        <Route path="/new/" element={<NewAdmin/>} />
-
-        
-      </Routes>
-        )
+      <Route exact path="/" element={<ShowAdmins adminList={adminList} />} />
+      <Route path="/edit/" element={<EditAdmin />} />
+      <Route path="/new/" element={<NewAdmin />} />
+    </Routes>
+  );
 }
-
