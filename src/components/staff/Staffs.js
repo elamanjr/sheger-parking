@@ -1,28 +1,63 @@
-import React, { Component } from 'react'
-import { Route, Routes } from 'react-router-dom'
-import { DeleteStaff, EditStaff, NewStaff, ShowStaffs } from './staffActions'
+import React, { useEffect, useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import { EditStaff, NewStaff, ShowStaffs } from './staffActions';
 
+export default function Staffs() {
+  let [staffList, setStaffList] = useState([]);
+  let [selectedStaffList, setSelectedStaffList] = useState([]);
 
-var staffList=[{'id':'345','fullName':'abel tesfaye','phone':'0912935475','email':'abc@gmail.com','password':'********','branch':'piyasa'}
-,{'id':'753','fullName':'kirubel tesfaye','phone':'0912935475','email':'abc@gmail.com','password':'********','branch':'megenagna'},{'id':'345','fullName':'tahir tesfaye','phone':'0923935572','email':'abc@gmail.com','password':'********','branch':'piyasa'}
-,{'id':'147','fullName':'amele tahir','phone':'0912935475','email':'abc@gmail.com','password':'********','branch':'megenagna'},{'id':'345','fullName':'abel tesfaye','phone':'0923935572','email':'abc@gmail.com','password':'********','branch':'piyasa'}
-,{'id':'458','fullName':'tsega tesfaye','phone':'0912935475','email':'abc@gmail.com','password':'********','branch':'megenagna'},{'id':'345','fullName':'behailu tesfaye','phone':'0923935572','email':'abc@gmail.com','password':'********','branch':'piyasa'}
-,{'id':'895','fullName':'getachew berihun','phone':'0912935475','email':'abc@gmail.com','password':'********','branch':'megenagna'},{'id':'345','fullName':'rahel tesfaye','phone':'0923935572','email':'abc@gmail.com','password':'********','branch':'piyasa'}
-,{'id':'856','fullName':'alemu tesfaye','phone':'0912935475','email':'abc@gmail.com','password':'********','branch':'megenagna'},{'id':'345','fullName':'kerim tesfaye','phone':'0923935572','email':'abc@gmail.com','password':'********','branch':'piyasa'}
-
-]
-
-export default class Staffs extends Component {
-  render() {
-    return (
-      <Routes>
-        <Route exact path="/" element={<ShowStaffs staffList={staffList}/>} />
-        <Route path="/edit/" element={<EditStaff/>} />
-        <Route path="/delete/" element={<DeleteStaff/>} />
-        <Route path="/new/" element={<NewStaff/>} />
-
-        
-      </Routes>
-    )
+  async function FetchAdmins() {
+    useEffect(() => {
+      fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/staffs', {
+        method: 'GET',
+      })
+        .then((response) => response.json())
+        .then((resp) => {
+          setStaffList(resp);
+          setSelectedStaffList(resp);
+        });
+    }, []);
   }
+
+  FetchAdmins();
+
+  setInterval(() => {
+    FetchAdmins();
+  }, 60000);
+
+  return (
+    <Routes>
+      <Route
+        exact
+        path="/"
+        element={
+          <ShowStaffs
+            staffList={staffList}
+            selectedStaffList={selectedStaffList}
+            setSelectedStaffList={setSelectedStaffList}
+          />
+        }
+      />
+      <Route
+        path="/edit/"
+        element={
+          <EditStaff
+            staffList={staffList}
+            selectedStaffList={selectedStaffList}
+            setSelectedStaffList={setSelectedStaffList}
+          />
+        }
+      />
+      <Route
+        path="/new/"
+        element={
+          <NewStaff
+            staffList={staffList}
+            selectedStaffList={selectedStaffList}
+            setSelectedStaffList={setSelectedStaffList}
+          />
+        }
+      />
+    </Routes>
+  );
 }

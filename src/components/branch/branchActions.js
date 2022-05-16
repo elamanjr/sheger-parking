@@ -1,73 +1,53 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from '../Button';
 import MapCard from '../MapCard';
+import * as ReactDOM from 'react-dom/client';
+import ErrorDisplay from '../ErrorDisplay';
+import { CheckApiResponse } from '../functions/CheckApiResponse';
+import GuidanceDisplay from '../GuidanceDisplay';
+import PageHeading from '../PageHeading';
+import UpdateAddState, { UpdateEditState, UpdateRemoveState } from '../functions/UpdateState';
 
-var branchesList = [
-  {
-    id: '123',
-    name: 'Piyasa Gorgis Branch',
-    location:
-      'https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d545.6957051723684!2d38.755200717403596!3d9.037417570403298!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e0!4m0!4m5!1s0x164b8f5efcffebd3%3A0xda821c73ef928f93!2sPiazza%2C%20Addis%20Ababa!3m2!1d9.0371838!2d38.7551432!5e1!3m2!1sen!2set!4v1648904269210!5m2!1sen!2set',
-    //   '<iframe src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d545.6957051723684!2d38.755200717403596!3d9.037417570403298!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e0!4m0!4m5!1s0x164b8f5efcffebd3%3A0xda821c73ef928f93!2sPiazza%2C%20Addis%20Ababa!3m2!1d9.0371838!2d38.7551432!5e1!3m2!1sen!2set!4v1648904269210!5m2!1sen!2set" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
-    description: 'around gorgis church',
-    capacity: '70',
-    onService: 'true',
-    pricePerHour: '20',
-  },
-  {
-    id: '345',
-    name: 'Megenagna Branch',
-    location:
-      'https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d1386.6564425810773!2d38.803164073067805!3d9.020940043123018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m0!4m5!1s0x164b85de7ac53005%3A0x2f76f90a2fb95d7f!2sTsige%20Worku%20W%2FGebriel%20Authorized%20Accounting%20Firm%2C%20Addis%20Ababa!3m2!1d9.0207822!2d38.8033346!5e1!3m2!1sen!2set!4v1648903092714!5m2!1sen!2set',
-
-    //   '<iframe src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d1386.6564425810773!2d38.803164073067805!3d9.020940043123018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m0!4m5!1s0x164b85de7ac53005%3A0x2f76f90a2fb95d7f!2sTsige%20Worku%20W%2FGebriel%20Authorized%20Accounting%20Firm%2C%20Addis%20Ababa!3m2!1d9.0207822!2d38.8033346!5e1!3m2!1sen!2set!4v1648903092714!5m2!1sen!2set" width="400" height="300" style={{border:0}} allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
-    description: 'around gorgis church',
-    capacity: '70',
-    onService: 'false',
-    pricePerHour: '30',
-  },
-  {
-    id: '678',
-    name: 'Bole Branch',
-    location:
-      'https://www.google.com/maps/embed?pb=!1m21!1m12!1m3!1d811.6924498347947!2d38.78788575260376!3d8.997116344652916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m6!3e0!4m0!4m3!3m2!1d8.997014199999999!2d38.788007199999996!5e1!3m2!1sen!2set!4v1648903281339!5m2!1sen!2set',
-    //   '<iframe src="https://www.google.com/maps/embed?pb=!1m21!1m12!1m3!1d811.6924498347947!2d38.78788575260376!3d8.997116344652916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m6!3e0!4m0!4m3!3m2!1d8.997014199999999!2d38.788007199999996!5e1!3m2!1sen!2set!4v1648903281339!5m2!1sen!2set" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
-    description: 'around gorgis church',
-    capacity: '70',
-    onService: 'true',
-    pricePerHour: '20',
-  },
-  {
-    id: '234',
-    name: 'Merkato Branch',
-    location:
-      'https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d611.7841202018227!2d38.74001916285653!3d9.033686627327128!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m0!4m5!1s0x164b85fef2f085e1%3A0x88a45f1fe8108b60!2sAddis%20Ketema%2C%20Addis%20Ababa!3m2!1d9.0335592!2d38.7399686!5e1!3m2!1sen!2set!4v1648903408331!5m2!1sen!2set',
-    //   '<iframe src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d611.7841202018227!2d38.74001916285653!3d9.033686627327128!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m0!4m5!1s0x164b85fef2f085e1%3A0x88a45f1fe8108b60!2sAddis%20Ketema%2C%20Addis%20Ababa!3m2!1d9.0335592!2d38.7399686!5e1!3m2!1sen!2set!4v1648903408331!5m2!1sen!2set" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
-    description: 'around gorgis church',
-    capacity: '70',
-    onService: 'true',
-    pricePerHour: '40',
-  },
-];
+var baseUrl = 'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/branches';
 //
 
-export function ShowBranches() {
+export function ShowBranches({
+  branchesList,
+  selectedBranchesList,
+  setSelectedBranchesList,
+}) {
+  var elementType = [
+    { value: 'id', name: 'ID' },
+    { value: 'name', name: 'Name' },
+    { value: 'location', name: 'Location' },
+    { value: 'capacity', name: 'Capacity' },
+    { value: 'onService', name: 'Service' },
+    { value: 'pricePerHour', name: 'Price' },
+    { value: 'description', name: 'Desc.' },
+  ];
+
   return (
     <div>
       <div className="column justify-content-between d-flex">
-        <h1 className="pb-4">List Of Branches</h1>
+        <PageHeading
+          userType="Branches"
+          fullData={branchesList}
+          data={selectedBranchesList}
+          setter={setSelectedBranchesList}
+          elementType={elementType}
+        />{' '}
         <Link to="new">
           <Button
             color=""
             bgColor="var(--primary-color)"
-            name="Add Admin"
-            id="addAdminBtn"
+            name="Add Branch"
+            id="addBranchBtn"
             className="btn px-4"
           />
         </Link>
       </div>
-      {branchesList.map((branch) => {
+      {selectedBranchesList.map((branch) => {
         return (
           <div>
             <div className="container-md cardContainer mb-4 shadow g-o row pt-4 d-flex justify-content-center">
@@ -120,14 +100,29 @@ export function ShowBranches() {
                   <div className="container mapContainer col-10">
                     <MapCard srcUrl={branch.location} />
                   </div>
-                  <div className="col-2 text-start">
-                    <span>
-                      <Link to="edit">
-                        <i
-                          className="fa-regular fa-pen-to-square"
-                          onclick="editBranch('{branch.name}','{branch.id}','{branch.description}','{branch.capacity}','{branch.onService}','{branch.pricePerHour}','{escape(branch.location)}')"
-                        ></i>
+                  <div className="col-2 text-start ">
+                    <span className="d-flex flex-row">
+                      <Link
+                        to="edit"
+                        state={{
+                          branch: branch,
+                        }}
+                      >
+                        <i className="fa-regular fa-pen-to-square h4"></i>
                       </Link>
+                      <div
+                        className="ms-4"
+                        onClick={() =>
+                          deleteBranch(
+                            branch.id,
+                            branchesList,
+                            selectedBranchesList,
+                            setSelectedBranchesList
+                          )
+                        }
+                      >
+                        <i className="fa-regular fa-trash-can h4"></i>
+                      </div>
                     </span>
                   </div>
                 </div>
@@ -141,14 +136,456 @@ export function ShowBranches() {
   );
 }
 
-export function EditBranch() {
-  return <div>EditBranch</div>;
+export function EditBranch({
+  branchesList,
+  selectedBranchesList,
+  setSelectedBranchesList}) {
+
+  let Location = useLocation();
+  const { branch } = Location.state;
+  // var { branchesList, selectedBranchesList, setSelectedBranchesList } =
+  // Location.state;
+  let navigate = useNavigate();
+
+  const [id, setId] = useState(branch.id);
+  const [branchName, setBranchName] = useState(branch.name);
+  const [capacity, setCapacity] = useState(branch.capacity);
+  const [onService, setOnservice] = useState(branch.onService);
+  const [pricePerHour, setPricePerHour] = useState(branch.pricePerHour);
+  const [description, setDescription] = useState(branch.description);
+  const [location, setLocation] = useState(branch.location);
+
+  // function checkApiResponse(apiResponse) {
+  //   const root = ReactDOM.createRoot(document.getElementById('errorDisplay'));
+
+  //   if (apiResponse.status < 500 && apiResponse.status >= 400) {
+  //     console.log(apiResponse.status);
+  //     root.render(
+  //       <ErrorDisplay
+  //         design="text-danger"
+  //         message="Your request wasn't accepted try check the fields and make sure the branch wasn't already registered"
+  //       />
+  //     );
+  //   } else if (apiResponse.status < 300 && apiResponse.status >= 200) {
+  //     root.render(<ErrorDisplay design="text-success" message="Success" />);
+  //   } else if (apiResponse.status < 600 && apiResponse.status >= 500) {
+  //     root.render(
+  //       <ErrorDisplay
+  //         design="text-danger"
+  //         message="Sorry we're currently experiencing technical difficulties"
+  //       />
+  //     );
+  //   }
+  // }
+
+  function editBranchAction() {
+    let headersList = {
+      'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
+      Accept: '/Application/json',
+      'Content-Type': 'application/json',
+    };
+
+    let bodyContent = JSON.stringify({
+      id: id,
+      name: branchName,
+      location: location,
+      description: description,
+      capacity: capacity,
+      onService: onService,
+      pricePerHour: pricePerHour,
+    });
+
+    fetch(`${baseUrl}/${id}`, {
+      method: 'PATCH',
+      body: bodyContent,
+      headers: headersList,
+    }).then((data) => {
+      // console.log(data);
+      CheckApiResponse(data, data.json());
+    });
+    // window.location("../")
+    let editItem = JSON.parse(bodyContent)
+
+    UpdateEditState(id,selectedBranchesList, setSelectedBranchesList, editItem)
+  }
+
+  return (
+    <form
+      className="form"
+      id="add-admin-form"
+      action=""
+      method=""
+      onSubmit={(e) => {
+        e.preventDefault();
+        editBranchAction();
+      }}
+    >
+      <h1 id="formHeader">Edit Branch</h1>
+      <div className="d-flex flex-row flex-wrap justify-content-between">
+        <div className="form-group">
+          <label for="branchName">Branch Name:</label>
+          <input
+            type="text"
+            className="form-control "
+            id="branchName"
+            placeholder="Branch Name"
+            name="branchName"
+            required
+            oninvalid="input_error('fullName')"
+            onChange={(e) => {
+              setBranchName(e.target.value);
+            }}
+            value={branchName}
+          />
+          <div id="branchNameError" className="errorOutput"></div>
+        </div>
+        <div className="w-4"></div>
+        <div className="form-group ">
+          <label for="capacity">Capacity:</label>
+          <input
+            type="text"
+            className="form-control tell"
+            id="capacity"
+            placeholder="Capacity"
+            name="capacity"
+            required
+            oninvalid="input_error('capacity')"
+            onChange={(e) => {
+              setCapacity(e.target.value);
+            }}
+            value={capacity}
+          />
+          <div id="capacityError" className="errorOutput"></div>
+        </div>
+      </div>
+      <div className="d-flex flex-row flex-wrap justify-content-between">
+        <div className="form-group">
+          <label for="description">Description:</label>
+          <textarea
+            type="text"
+            className="form-control password"
+            id="description"
+            placeholder="Description"
+            name="description"
+            required
+            oninvalid="input_error('description')"
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            value={description}
+          />
+          <div id="passwordError" className="errorOutput"></div>
+        </div>
+
+        <div className="form-group">
+          <label for="pricePerHour">Price Per Hour:</label>
+          <input
+            type="text"
+            className="form-control password"
+            id="pricePerHour"
+            placeholder="Price Per Hour"
+            name="pricePerHour"
+            required
+            oninvalid="input_error('pricePerHour')"
+            onChange={(e) => {
+              setPricePerHour(e.target.value);
+            }}
+            value={pricePerHour}
+          />
+          <div id="pricePerHourError" className="errorOutput"></div>
+        </div>
+      </div>
+
+      <div className="d-flex flex-row flex-wrap justify-content-between">
+        <div className="form-group">
+          <label for="location" id="location">
+            Location:
+          </label>
+          <textarea
+            type="text"
+            className="form-control password pe-4"
+            id="location"
+            placeholder="Location"
+            name="location"
+            required
+            oninvalid="input_error('location')"
+            onChange={(e) => {
+              setLocation(e.target.value);
+            }}
+            value={location}
+          />
+          <div id="locationError" className="errorOutput"></div>
+          <p>
+            <br />
+            <strong>Guidance to insert a location </strong> <br />
+            <ul>
+              <li>go to google maps </li>
+              <li>select the location of the branch as a destination</li>
+              <li> go to left menu and select share or embed map </li>
+              <li>select embed map </li>
+              <li>choose the small size</li>
+              <li>copy the text and paste it here</li>
+              <li>
+                from the text you just copied select the address inside src and
+                copy it
+              </li>
+              <li>paste it here</li>
+            </ul>
+          </p>
+        </div>
+      </div>
+      <div className="form-group">
+        <label for="onService" className="pe-4 align-middle">
+          On Service: ({onService})
+        </label>
+        <label>
+          True
+          <input
+            type="radio"
+            name="onService"
+            value={true}
+            onChange={(e) => setOnservice(e.target.value)}
+          />
+        </label>
+        <label className="ps-2">
+          False
+          <input
+            name="onService"
+            type="radio"
+            value={false}
+            onChange={(e) => setOnservice(e.target.value)}
+          />
+        </label>
+
+        <div id="onServiceError" className="errorOutput"></div>
+      </div>
+      <div id="errorDisplay"></div>
+      <br />
+      <button className="btn btn-customized buttonWider" id="addBtn">
+        Save Branch
+      </button>
+    </form>
+  );
 }
 
-export function NewBranch() {
-  return <div>NewBranch</div>;
+export function NewBranch({
+  branchesList,
+  selectedBranchesList,
+  setSelectedBranchesList}) {
+  let navigate = useNavigate();
+
+  const [id, setId] = useState();
+  const [branchName, setBranchName] = useState();
+  const [capacity, setCapacity] = useState();
+  const [onService, setOnservice] = useState();
+  const [pricePerHour, setPricePerHour] = useState();
+  const [description, setDescription] = useState();
+  const [location, setLocation] = useState();
+
+  function newBranchAction() {
+    let headersList = {
+      'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
+      Accept: '/Application/json',
+      'Content-Type': 'application/json',
+    };
+
+    let bodyContent = JSON.stringify({
+      id: id,
+      name: branchName,
+      location: location,
+      description: description,
+      capacity: capacity,
+      onService: onService,
+      pricePerHour: pricePerHour,
+    });
+
+    fetch(`${baseUrl}`, {
+      method: 'POST',
+      body: bodyContent,
+      headers: headersList,
+    }).then((data) => {
+      console.log(data);
+      CheckApiResponse(data, data.json());
+    });
+
+    let newItem = JSON.parse(bodyContent)
+
+    UpdateAddState(selectedBranchesList,
+      setSelectedBranchesList,newItem)
+  }
+  function locationGuidance() {
+    const root = ReactDOM.createRoot(
+      document.getElementById('guidanceDisplay')
+    );
+
+    root.render(<GuidanceDisplay />);
+  }
+
+  return (
+    <form
+      className="form"
+      id="add-admin-form"
+      action=""
+      method=""
+      onSubmit={(e) => {
+        e.preventDefault();
+        newBranchAction();
+      }}
+    >
+      <h1 id="formHeader">New Branch</h1>
+      <div className="d-flex flex-row flex-wrap justify-content-between">
+        <div className="form-group">
+          <label for="branchName">Branch Name:</label>
+          <input
+            type="text"
+            className="form-control "
+            id="branchName"
+            placeholder="Branch Name"
+            name="branchName"
+            required
+            oninvalid="input_error('fullName')"
+            onChange={(e) => {
+              setBranchName(e.target.value);
+            }}
+          />
+          <div id="branchNameError" className="errorOutput"></div>
+        </div>
+        <div className="w-4"></div>
+        <div className="form-group ">
+          <label for="capacity">Capacity:</label>
+          <input
+            type="text"
+            className="form-control tell"
+            id="capacity"
+            placeholder="Capacity"
+            name="capacity"
+            required
+            oninvalid="input_error('capacity')"
+            onChange={(e) => {
+              setCapacity(e.target.value);
+            }}
+          />
+          <div id="capacityError" className="errorOutput"></div>
+        </div>
+      </div>
+      <div className="d-flex flex-row flex-wrap justify-content-between">
+        <div className="form-group">
+          <label for="description">Description:</label>
+          <textarea
+            type="text"
+            className="form-control password"
+            id="description"
+            placeholder="Description"
+            name="description"
+            required
+            oninvalid="input_error('description')"
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+          />
+          <div id="passwordError" className="errorOutput"></div>
+        </div>
+
+        <div className="form-group">
+          <label for="pricePerHour">Price Per Hour:</label>
+          <input
+            type="text"
+            className="form-control password"
+            id="pricePerHour"
+            placeholder="Price Per Hour"
+            name="pricePerHour"
+            required
+            oninvalid="input_error('pricePerHour')"
+            onChange={(e) => {
+              setPricePerHour(e.target.value);
+            }}
+          />
+          <div id="pricePerHourError" className="errorOutput"></div>
+        </div>
+      </div>
+
+      <div className="d-flex flex-row flex-wrap justify-content-between">
+        <div className="form-group">
+          <label for="location" id="location">
+            Location:
+          </label>
+          <textarea
+            type="text"
+            className="form-control password pe-4"
+            id="location"
+            placeholder="Location"
+            name="location"
+            required
+            oninvalid="input_error('location')"
+            onChange={(e) => {
+              setLocation(e.target.value);
+            }}
+          />
+          <div id="locationError" className="errorOutput"></div>
+          <div id="guidanceDisplay">
+            <Button
+              name="click for guidance"
+              id="guidanceBtn"
+              color=""
+              bgColor="var(--primary-color)"
+              className="btn px-4"
+              onclick={() => {
+                locationGuidance();
+              }}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="form-group">
+        <label for="onService" className="pe-4 align-middle">
+          On Service:
+        </label>
+        <label>
+          True
+          <input
+            type="radio"
+            name="onService"
+            value={true}
+            onChange={(e) => setOnservice(e.target.value)}
+          />
+        </label>
+        <label className="ps-2">
+          False
+          <input
+            name="onService"
+            type="radio"
+            value={false}
+            onChange={(e) => setOnservice(e.target.value)}
+          />
+        </label>
+
+        <div id="onServiceError" className="errorOutput"></div>
+      </div>
+      <div id="errorDisplay"></div>
+      <br />
+      <button className="btn btn-customized buttonWider" id="addBtn">
+        Add Branch
+      </button>
+    </form>
+  );
 }
 
-export default function DeleteBranch() {
-  return <div>DeleteBranch</div>;
+function deleteBranch(
+  id,
+  branchesList,
+  selectedBranchesList,
+  setSelectedBranchesList
+) {
+  let confirmation = window.confirm('you sure you want to delete the Branch');
+
+  if (confirmation) {
+    fetch(`${baseUrl}/${id}`, {
+      method: 'DELETE',
+    }).then((resp) => {
+      resp.json();
+    });
+
+    UpdateRemoveState(id,selectedBranchesList,setSelectedBranchesList)
+    
+  }
 }

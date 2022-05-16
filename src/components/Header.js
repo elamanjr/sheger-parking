@@ -10,12 +10,8 @@ export default class Header extends Component {
           <div className="row">
             <div className="col-6">
               <div className="col-6"></div>
-              <h1
-                className="col-6 text-center clickable"
-              >
-              <Link to="/user/">
-                Administrator
-                </Link>
+              <h1 className="col-6 text-center clickable">
+                <Link to="/">Administrator</Link>
               </h1>
             </div>
 
@@ -24,18 +20,26 @@ export default class Header extends Component {
                 <div className="col-8"></div>
 
                 <div className="col-2 container headerPageListContainer rounded row me-2 shadow-sm">
-                  <Link to="/user">
+                  <Link to="/">
                     <a className="text-center " id="overviewBtn">
                       Overview
                     </a>
                   </Link>
                 </div>
-                <div className="col-2 ms-4 text-right" >
-                <div className='row'>
-                    <div className='col-6'></div>
-                    <i class="fa-solid fa-arrow-right-from-bracket h1 col-6" id="logoutBtn"></i>
-                    </div>
-                    </div>
+                <div className="col-2 ms-4 text-right">
+                  <div className="row">
+                    <div
+                      className="col-6"
+                      
+                    ></div>
+                    <i onClick={() =>{ 
+                      localStorage.setItem("loggedIn",false)
+                      window.location.reload()}}
+                      class="fa-solid fa-arrow-right-from-bracket h1 col-6"
+                      id="logoutBtn"
+                    ></i>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

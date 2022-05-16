@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 export default function SideNavBar() {
     const [showTypesOfUsers,setShow]=useState(false)
     return (
-        <aside className=" container col-2 navigationContainer   pt-2 shadow navbar left-sidebar d-flex align-items-start" >
+        <aside className="container col-2 navigationContainer pt-2 shadow navbar left-sidebar d-flex align-items-start" >
             
             <div className="container-fluid mt-5" >
 
@@ -26,6 +26,7 @@ export default function SideNavBar() {
                 <div className="container-fluid row ">
                     <div className=" row border-bottom sidebarList">
                         <a id="branchesBtn" onClick={()=>{}}><Link to="branches"> Branches</Link></a>
+                        <a id="reservationsBtn" onClick={()=>{}}><Link to="reservations"> Reservations</Link></a>
                     </div>
                 </div>
             </div>

@@ -1,77 +1,87 @@
-import React from 'react'
-import { Link } from 'react-router-dom';
+import React from 'react';
+// import { Link } from 'react-router-dom';
 import Button from '../Button';
+import { UpdateRemoveState } from '../functions/UpdateState';
+import PageHeading from '../PageHeading';
 
-export function ShowClients({clientList}) {
-    return (
-        <div className=''>
-            <h1 className='pb-2'>List Of Clients</h1>
-          <table className="table table-striped">
-            <tbody className="">
+export function ShowClients({
+  clientList,
+  selectedClientList,
+  setSelectedClientList,
+}) {
+  var elementType = [
+    { value: 'id', name: 'ID' },
+    { value: 'fullName', name: 'Full Name' },
+    { value: 'phone', name: 'Phone' },
+    { value: 'email', name: 'Email' },
+    { value: 'defaultPlateNumber', name: 'PlateNumber' },
+  ];
+
+  return (
+    <div className="">
+      <PageHeading
+        userType="Client"
+        // onclick={() => alert('yello')}
+        fullData={clientList}
+        data={selectedClientList}
+        setter={setSelectedClientList}
+        elementType={elementType}
+      />{' '}
+      <table className="table table-striped">
+        <tbody className="">
+          <tr>
+            <th>Id</th>
+            <th>Full Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Default PlateNo.</th>
+
+            <th>Password</th>
+            <th></th>
+          </tr>
+        </tbody>
+        <tbody id="tableDataField">
+          {selectedClientList.map((item) => {
+            return (
               <tr>
-                <th>Id</th>
-                <th>Full Name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Default PlateNo.</th>
+                <td>{item.id}</td>
+                <td>{item.fullName}</td>
+                <td>{item.phone}</td>
+                <td>{item.email}</td>
+                <td>{item.defaultPlateNumber}</td>
 
-                <th>Password</th>
-                <th>
-                  
-                </th>
+                <td>{item.passwordHash}</td>
+                <td>
+                  <Button
+                    color=""
+                    bgColor=""
+                    name="Delete"
+                    id={item.id}
+                    className="btn deleteButton ms-1"
+                    onclick={() => DeleteClient(item.id,selectedClientList,
+                      setSelectedClientList)}
+                  />
+                </td>
               </tr>
-            </tbody>
-            <tbody id="tableDataField">
-              {clientList.map((item) => {
-                return (
-                  <tr>
-                    <td>{item.id}</td>
-                    <td>{item.fullName}</td>
-                    <td>{item.phone}</td>
-                    <td>{item.email}</td>
-                    <td>{item.defaultPlateNumber}</td>
-
-                    <td>{item.password}</td>
-                    <td>
-                      <Link to="edit">
-                        <Button
-                          color=""
-                          bgColor=""
-                          name="Edit"
-                          id={item.id}
-                          className="btn editBtn"
-                        />
-                      </Link>
-    
-                      <Link to="delete">
-                        <Button
-                          color=""
-                          bgColor=""
-                          name="Delete"
-                          id={item.id}
-                          className="btn deleteButton ms-1"
-                        />
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      );
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
+function DeleteClient(id,selectedClientList,
+  setSelectedClientList) {
+  let confirmation = window.confirm('you sure you want to delete the client');
 
-export function EditClient() {
-  return (
-    <div>EditClient</div>
-  )
+  if (confirmation) {
+    fetch(`http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients/${id}`, {
+      method: 'DELETE',
+    }).then((resp) => {
+      resp.json();
+    });
+
+    UpdateRemoveState(id,selectedClientList,setSelectedClientList)
+  }
 }
-
-export function DeleteClient() {
-  return (
-    <div>DeleteClient</div>
-  )
-}
-

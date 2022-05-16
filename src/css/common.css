@@ -102,7 +102,7 @@ a:hover{
     font-size: larger;
 }
 li{
-    list-style: none;
+    /* list-style: none; */
 }
 .errorMessage{
     color: var(--danger)

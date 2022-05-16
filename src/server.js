@@ -5,6 +5,7 @@ const app = express();
 app.use(express.static(path.resolve('build')));
 
 app.get('*', (req, res) => {
+  console.log(req.ur)
   res.sendFile(path.resolve('build', 'index.html'));
 });
 

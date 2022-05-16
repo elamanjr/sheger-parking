@@ -2,16 +2,15 @@ import { Routes, Route } from 'react-router-dom';
 import Admins from '../admin/Admins';
 import Branches from '../branch/Branches';
 import Clients from '../client/Clients';
+import Reservations from '../reservation/Reservations';
 
 import Header from '../Header'
-import Overview from '../Overview';
+import Overview from '../overview/Overview';
 import SideNavBar from '../SideNavBar'
 import Staffs from '../staff/Staffs';
 
+
 import '../../css/common.css'
-
-
-
 
 export default function Index() {
 
@@ -30,6 +29,7 @@ export default function Index() {
         <Route path="/clients/*" element={<Clients/>} />
         <Route path="/staffs/*" element={<Staffs />} />
         <Route path="/branches/*" element={<Branches />} />
+        <Route path="/reservations/*" element={<Reservations />} />
       </Routes>
       </div>
 

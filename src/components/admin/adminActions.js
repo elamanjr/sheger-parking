@@ -1,13 +1,38 @@
 import Button from '../Button';
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import * as ReactDOM from 'react-dom/client';
 
-// var baseURL = 'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins/';
-export function ShowAdmins({ adminList }) {
+import ErrorDisplay from '../ErrorDisplay';
+import { CheckApiResponse } from '../functions/CheckApiResponse';
+import { Hash } from '../functions/Hash';
+import PageHeading from '../PageHeading';
+import UpdateAddState, { UpdateEditState, UpdateRemoveState } from '../functions/UpdateState';
+
+
+var baseURL = 'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins';
+export function ShowAdmins({
+  adminList,
+  selectedAdminList,
+  setSelectedAdminList
+}) {
+  var elementType = [
+    { value: 'id', name: 'ID' },
+    { value: 'fullName', name: 'Full Name' },
+    { value: 'phone', name: 'Phone' },
+    { value: 'email', name: 'Email' },
+  ];
   return (
     <div className="">
-      <h1 className="pb-2">List Of Admins</h1>
+      <PageHeading
+        userType="Admins"
+        // onclick={() => alert('yello')}
+        fullData={adminList}
+        data={selectedAdminList}
+        setter={setSelectedAdminList}
+        elementType={elementType}
+      />
       <table className="table table-striped">
         <tbody className="">
           <tr>
@@ -30,33 +55,34 @@ export function ShowAdmins({ adminList }) {
           </tr>
         </tbody>
         <tbody id="tableDataField">
-          {adminList.map((item) => {
+          {selectedAdminList.map((item) => {
             return (
               <tr>
                 <td>{item.id}</td>
                 <td>{item.fullName}</td>
                 <td>{item.phone}</td>
                 <td>{item.email}</td>
-                <td>{item.password}</td>
+                <td>{item.passwordHash}</td>
                 <td>
-                <Link to="edit" state={{item:item}} >
+                  <Link to="edit" state={{ item: item }}>
                     <Button
                       color=""
                       bgColor=""
                       name="Edit"
                       id={item.id}
                       className="btn editBtn"
-                      // onclick={() => EditAdmin()}
-
                     />
-                    </Link>
+                  </Link>
                   <Button
                     color=""
                     bgColor=""
                     name="Delete"
                     id={item.id}
                     className="btn deleteButton ms-1"
-                    onclick={() => DeleteAdmin(item.id)}
+                    onclick={() => DeleteAdmin(item.id,adminList,
+                      selectedAdminList,
+                      setSelectedAdminList
+                      )}
                   />
                 </td>
               </tr>
@@ -68,61 +94,67 @@ export function ShowAdmins({ adminList }) {
   );
 }
 
-export function NewAdmin() {
-  let navigate = useNavigate();
+export function NewAdmin({
+  adminList,
+  selectedAdminList,
+  setSelectedAdminList
+}) {
+  const [id, setId] = useState("to be assigned");
+  const [fullName, setFullName] = useState();
+  const [phone, setPhone] = useState();
+  const [email, setEmail] = useState();
+  const [passwordHash, setPasswordHash] = useState();
 
-  const [id, setId] = useState('123');
-  const [fullName, setFullName] = useState('eyob abel');
-  const [phone, setPhone] = useState('1445ss1178956');
-  const [email, setEmail] = useState('abel@gmail.com');
-  const [passwordHash, setPasswordHash] = useState('jaflnsdhe');
+  const [confirmpsdd, setConfirmPsdd] = useState();
   const [defaultAdmin, setDefaultAdmin] = useState(false);
 
-  let data = {
-    id,
-    fullName,
-    phone,
-    email,
-    passwordHash,
-    defaultAdmin,
-  };
+  async function newAdminAction() {
+    if (confirmpsdd != passwordHash) {
+      const root = ReactDOM.createRoot(document.getElementById('errorDisplay'));
 
-  function newAdminAction() {
+      root.render(
+        <ErrorDisplay
+          design="text-danger"
+          message="Your Password Doesn't Match!"
+        />
+      );
+    } else {
+      let headersList = {
+        Accept: '/Application/json',
+        'Content-Type': 'application/json',
+      };
 
-    
-    let headersList = {
-      Accept: '/Application/json',
-      'Content-Type': 'application/json',
-      // "mode": 'no-cors',
-    };
+      let finalHash = await Hash(passwordHash);
 
-    let bodyContent = JSON.stringify({
-      id,
-      fullName,
-      phone,
-      email,
-      passwordHash,
-      defaultAdmin,
-    });
-
-    fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins/', {
-      method: 'POST',
-      body: bodyContent,
-      headers: headersList,
-    })
-      .then(function (response) {
-        return response.text();
-      })
-      .then(function (data) {
-        console.log(data);
+      let bodyContent = JSON.stringify({
+        id: id,
+        fullName: fullName,
+        phone: phone,
+        email: email,
+        passwordHash: finalHash,
+        defaultAdmin: defaultAdmin,
       });
+      fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins/', {
+        method: 'POST',
+        body: bodyContent,
+        headers: headersList,
+      })
+        .then(function (response) {
+          return response;
+        })
+        .then(function (data) {
+          CheckApiResponse(data, data.json());
+        });
 
-      // window.location.replace("/")
-      navigate(`../`)
-      window.location.reload()
+      
+        let newItem = JSON.parse(bodyContent)
 
-
+        UpdateAddState(selectedAdminList,
+          setSelectedAdminList,newItem)  
+     
+    }
   }
+
   return (
     <form
       className="form"
@@ -130,9 +162,9 @@ export function NewAdmin() {
       action=""
       method=""
       onSubmit={(e) => {
-        newAdminAction();
         e.preventDefault();
-        // console.log(data)
+
+        newAdminAction();
       }}
     >
       <h1 id="formHeader">New Admin</h1>
@@ -214,6 +246,9 @@ export function NewAdmin() {
           name="confirmPassword"
           required
           oninvalid="input_error('confirmPassword')"
+          onChange={(e) => {
+            setConfirmPsdd(e.target.value);
+          }}
         />
         <div id="confirmPasswordError" className="errorOutput"></div>
       </div>
@@ -230,24 +265,32 @@ export function NewAdmin() {
   );
 }
 
-function DeleteAdmin(id) {
+async function DeleteAdmin(delId,adminList,
+  selectedAdminList,
+  setSelectedAdminList
+  ) {
   let confirmation = window.confirm('you sure you want to delete the admin');
 
   if (confirmation) {
-    fetch(`http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins/${id}`, {
+    fetch(`${baseURL}/${delId}`, {
       method: 'DELETE',
     }).then((resp) => {
       resp.json();
     });
 
-    window.location.reload();
+    UpdateRemoveState(delId,selectedAdminList,setSelectedAdminList)
+
+    
   }
 }
 
-export function EditAdmin() {
-
-  const location = useLocation()
-  const {item} = location.state
+export function EditAdmin({
+  adminList,
+  selectedAdminList,
+  setSelectedAdminList
+}) {
+  const location = useLocation();
+  const { item } = location.state;
 
   let navigate = useNavigate();
 
@@ -256,38 +299,50 @@ export function EditAdmin() {
   const [phone, setPhone] = useState(item.phone);
   const [email, setEmail] = useState(item.email);
   const [passwordHash, setPasswordHash] = useState(item.passwordHash);
+  const [confirmPsdd, setconfirmPsdd] = useState(item.passwordHash);
+
   const [defaultAdmin, setDefaultAdmin] = useState(item.defaultAdmin);
 
   function editAdminAction() {
+    if (confirmPsdd != passwordHash) {
+      const root = ReactDOM.createRoot(document.getElementById('errorDisplay'));
 
-    let headersList = {
-      "Accept": "/Application/json",
-      "Content-Type": "application/json"
-     }
-     
-     let bodyContent = JSON.stringify({
-         id,
-         fullName,
-         phone,
-         email,
-         passwordHash,
-         defaultAdmin
-     });
-     
-     fetch("http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins/626f697a0748c1b4074378a9", { 
-       method: "PATCH",
-       body: bodyContent,
-       headers: headersList
-     }).then(function(response) {
-       return response.text();
-     }).then(function(data) {
-       console.log(data);
-     })
-      // window.location.replace("/")
-      navigate(`../`)
-      window.location.reload()
+      root.render(
+        <ErrorDisplay
+          design="text-danger"
+          message="Your Password Doesn't Match!"
+        />
+      );
+    } else {
+      let headersList = {
+        Accept: '/Application/json',
+        'Content-Type': 'application/json',
+      };
 
+      let bodyContent = JSON.stringify({
+        id,
+        fullName,
+        phone,
+        email,
+        passwordHash,
+        defaultAdmin,
+      });
 
+      fetch(`${baseURL}/${item.id}`, {
+        method: 'PATCH',
+        body: bodyContent,
+        headers: headersList,
+      }).then(function (data) {
+        // console.log(data);
+        CheckApiResponse(data, data.json());
+      });
+
+      let editItem = JSON.parse(bodyContent)
+
+    UpdateEditState(id,selectedAdminList, setSelectedAdminList, editItem)
+  
+    }
+   
   }
   return (
     <form
@@ -310,13 +365,11 @@ export function EditAdmin() {
           id="fullName"
           placeholder="Full Name"
           name="fullName"
-          
           oninvalid="input_error('fullName')"
           onChange={(e) => {
             setFullName(e.target.value);
           }}
           value={fullName}
-          
         />
         <div id="fullNameError" className="errorOutput"></div>
       </div>
@@ -328,14 +381,11 @@ export function EditAdmin() {
           id="phone"
           placeholder="Phone"
           name="phone"
-          
           oninvalid="input_error('phone')"
           onChange={(e) => {
             setPhone(e.target.value);
           }}
           value={phone}
-
-
         />
         <div id="phoneError" className="errorOutput"></div>
       </div>
@@ -348,14 +398,11 @@ export function EditAdmin() {
           id="email"
           placeholder="Email : example@email.com"
           name="email"
-          
           oninvalid="input_error('email')"
           onChange={(e) => {
             setEmail(e.target.value);
           }}
           value={email}
-
-
         />
         <div id="emailError" className="errorOutput"></div>
       </div>
@@ -368,14 +415,11 @@ export function EditAdmin() {
           id="password"
           placeholder="Password"
           name="password"
-          
           oninvalid="input_error('password')"
           onChange={(e) => {
             setPasswordHash(e.target.value);
           }}
           value={passwordHash}
-
-
         />
         <div id="passwordError" className="errorOutput"></div>
       </div>
@@ -389,20 +433,17 @@ export function EditAdmin() {
           id="confirmPassword"
           placeholder="Confirm Password"
           name="confirmPassword"
-          
           oninvalid="input_error('confirmPassword')"
-          value={passwordHash}
-
-
+          onChange={(e) => {
+            setconfirmPsdd(e.target.value);
+          }}
+          value={confirmPsdd}
         />
         <div id="confirmPasswordError" className="errorOutput"></div>
       </div>
       <div id="errorDisplay"></div>
       <br />
-      <button
-        className="btn btn-customized buttonWider"
-        id="addBtn"
-      >
+      <button className="btn btn-customized buttonWider" id="addBtn">
         Save
       </button>
     </form>
