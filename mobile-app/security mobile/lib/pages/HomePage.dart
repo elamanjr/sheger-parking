@@ -1,6 +1,7 @@
 // ignore_for_file: file_names, prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sheger_parking_security/constants/colors.dart';
 import 'package:sheger_parking_security/constants/strings.dart';
 import 'package:sheger_parking_security/pages/LoginPage.dart';
@@ -69,7 +70,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     ),
-                    FlatButton(onPressed: (){
+                    FlatButton(onPressed: () async {
+                      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                      sharedPreferences.remove("email");
                       Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
                     }, child: Text("Log out",
                       style: TextStyle(

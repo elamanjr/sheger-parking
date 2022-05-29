@@ -80,9 +80,27 @@ class _ReservationsState extends State<Reservations> {
    Future<List<ReservationDetails>> getReservationDetails(String query) async {
 
     final url = Uri.parse(
-        'http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/clients/$id/reservations');
+        'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients/$id/reservations');
+
     final response = await http.get(url);
 
+    while(response.statusCode != 200){
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List reservationDetails = json.decode(response.body);
+
+        return reservationDetails.map((json) => ReservationDetails.fromJson(json)).where((reservationDetail) {
+          final reservationPlateNumberLower = reservationDetail.reservationPlateNumber.toLowerCase();
+          final branchLower = reservationDetail.branch.toLowerCase();
+          final searchLower = query.toLowerCase();
+
+          return reservationPlateNumberLower.contains(searchLower) ||
+              branchLower.contains(searchLower);
+        }).toList();
+      }
+
+    }
     if (response.statusCode == 200) {
       final List reservationDetails = json.decode(response.body);
 
@@ -116,10 +134,12 @@ class _ReservationsState extends State<Reservations> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: Column(
+    return
+      // SingleChildScrollView(
+      // child: SizedBox(
+      //   height: MediaQuery.of(context).size.height,
+      //   child:
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Center(
@@ -249,8 +269,8 @@ class _ReservationsState extends State<Reservations> {
         ),
             ) : Expanded(child: NoReservation()),
           ],
-        ),
-      ),
+      //   ),
+      // ),
     );
   }
 

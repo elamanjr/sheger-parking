@@ -53,7 +53,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Future<List<UserDetails>> getUserDetails(String query) async {
 
     final url = Uri.parse(
-        'http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/clients');
+        'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -105,7 +105,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       'Accept': '*/*',
       'Content-Type': 'application/json'
     };
-    var url = Uri.parse('http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/clients/$id');
+    var url = Uri.parse('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients/$id');
 
     var body = {
       "passwordHash": hashedPassword
@@ -129,7 +129,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Future verify() async {
     var headersList = {'Accept': '*/*', 'Content-Type': 'application/json'};
     var url = Uri.parse(
-        'http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/clients/recover');
+        'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients/recover');
 
     var body = {"email": user.email};
     var req = http.Request('POST', url);

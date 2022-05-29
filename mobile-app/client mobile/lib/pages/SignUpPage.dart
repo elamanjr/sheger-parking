@@ -3,6 +3,7 @@
 
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sheger_parking/models/User.dart';
 import 'package:sheger_parking/pages/HomePage.dart';
 import 'package:sheger_parking/pages/LoginPage.dart';
@@ -33,7 +34,7 @@ class _SignUpPageState extends State<SignUpPage> {
       'Accept': '*/*',
       'Content-Type': 'application/json'
     };
-    var url = Uri.parse('http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/clients/signup');
+    var url = Uri.parse('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients/signup');
 
     var body = {
       "fullName": user.fullName,
@@ -66,7 +67,7 @@ class _SignUpPageState extends State<SignUpPage> {
       'Accept': '*/*',
       'Content-Type': 'application/json'
     };
-    var url = Uri.parse('http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/clients');
+    var url = Uri.parse('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients');
 
     var body = {
       "fullName": user.fullName,
@@ -90,6 +91,15 @@ class _SignUpPageState extends State<SignUpPage> {
       String email = data["email"].toString();
       String passwordHash = data["passwordHash"].toString();
       String defaultPlateNumber = data["defaultPlateNumber"].toString();
+
+      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setString("id", id);
+      sharedPreferences.setString("fullName", fullName);
+      sharedPreferences.setString("phone", phone);
+      sharedPreferences.setString("email", email);
+      sharedPreferences.setString("passwordHash", passwordHash);
+      sharedPreferences.setString("defaultPlateNumber", defaultPlateNumber);
+
       print(resBody);
       Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(id: id, fullName: fullName, phone: phone, email: email, passwordHash: passwordHash, defaultPlateNumber: defaultPlateNumber)));
     }

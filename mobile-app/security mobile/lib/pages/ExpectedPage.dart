@@ -52,7 +52,7 @@ class _ExpectedPageState extends State<ExpectedPage> {
 
   static Future<List<ReservationDetails>> getReservationDetails(String query) async {
     final url = Uri.parse(
-        'http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/reservations');
+        'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/reservations');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -91,7 +91,7 @@ class _ExpectedPageState extends State<ExpectedPage> {
       'Accept': '*/*',
       'Content-Type': 'application/json'
     };
-    var url = Uri.parse('http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/reservations/$reserveId');
+    var url = Uri.parse('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/reservations/$reserveId');
 
     var body = {
       "parked": isParked

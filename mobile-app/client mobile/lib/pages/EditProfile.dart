@@ -31,7 +31,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       'Accept': '*/*',
       'Content-Type': 'application/json'
     };
-    var url = Uri.parse('http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/clients/${id}');
+    var url = Uri.parse('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients/${id}');
 
     var body = {
       "fullName": fullName,

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sheger_parking_security/pages/LoginPage.dart';
+import 'package:sheger_parking_security/pages/SplashScreen.dart';
+
+//public server url - https://api-shegerparking.loca.lt
+//online server url - https://shegerparking.herokuapp.com
+//local server url - http://127.0.0.1:5000
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +31,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home:
-      LoginPage(),
+      SplashScreen(),
     );
   }
 }

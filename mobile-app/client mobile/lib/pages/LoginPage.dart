@@ -4,6 +4,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sheger_parking/models/User.dart';
 import 'package:sheger_parking/pages/ForgotPassword.dart';
 import 'package:sheger_parking/pages/HomePage.dart';
@@ -34,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       'Accept': '*/*',
       'Content-Type': 'application/json'
     };
-    var url = Uri.parse('http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/clients/login');
+    var url = Uri.parse('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients/login');
 
     var body = {
       "phone": user.phone,
@@ -59,6 +60,14 @@ class _LoginPageState extends State<LoginPage> {
       String email = data["email"].toString();
       String passwordHash = data["passwordHash"].toString();
       String defaultPlateNumber = data["defaultPlateNumber"].toString();
+
+      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setString("id", id);
+      sharedPreferences.setString("fullName", fullName);
+      sharedPreferences.setString("phone", phone);
+      sharedPreferences.setString("email", email);
+      sharedPreferences.setString("passwordHash", passwordHash);
+      sharedPreferences.setString("defaultPlateNumber", defaultPlateNumber);
       // var content = json.decode(resBody);
       // phone = content["phone"].toString();
       // passwordHash = content["passwordHash"].toString();
@@ -247,7 +256,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
-                      onPressed: () {
+                      onPressed: (){
                         if (_formKey.currentState!.validate()) {
                           save();
                         }

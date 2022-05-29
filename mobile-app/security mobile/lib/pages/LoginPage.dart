@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sheger_parking_security/constants/colors.dart';
 import 'package:sheger_parking_security/constants/strings.dart';
 import 'package:sheger_parking_security/models/Staff.dart';
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
       'Accept': '*/*',
       'Content-Type': 'application/json'
     };
-    var url = Uri.parse('http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/staffs/login');
+    var url = Uri.parse('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/staffs/login');
 
     var body = {
       "phone": staff.phone,
@@ -48,6 +49,13 @@ class _LoginPageState extends State<LoginPage> {
 
     if (res.statusCode >= 200 && res.statusCode < 300) {
       print(resBody);
+
+      var data = json.decode(resBody);
+      String email = data["email"].toString();
+
+      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setString("email", email);
+
       Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
     }
     else {

@@ -97,7 +97,7 @@ class _EditReservationState extends State<EditReservation> {
       'Content-Type': 'application/json'
     };
     var url = Uri.parse(
-        'http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/reservations/$reservationId');
+        'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/reservations/$reservationId');
 
     var body = {
       "reservationPlateNumber": reservationPlateNumber,
@@ -180,7 +180,7 @@ class _EditReservationState extends State<EditReservation> {
   static Future<List<BranchDetails>> getBranchDetails(
       String query) async {
     final url = Uri.parse(
-        'http://10.4.103.211:5000/token:qwhu67fv56frt5drfx45e/branches');
+        'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/branches');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
