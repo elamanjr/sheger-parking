@@ -1,0 +1,92 @@
+{
+    "User": {
+        "id": {
+            "type": "string"
+        },
+        "fullName": {
+            "type": "string"
+        },
+        "phone": {
+            "type": "string"
+        },
+        "email": {
+            "type": "string"
+        },
+        "passwordHash": {
+            "type": "string"
+        }
+    },
+    "Admin": {
+        "extends": {
+            "$ref": "#/User"
+        },
+        "defaultAdmin": {
+            "type": "boolean"
+        }
+    },
+    "Client": {
+        "extends": {
+            "$ref": "#/User"
+        },
+        "defaultPlateNumber": {
+            "type": "string"
+        }
+    },
+    "Staff": {
+        "extends": {
+            "$ref": "#/User"
+        },
+        "branch": {
+            "type": "string"
+        }
+    },
+    "Branch":{
+        "id":{
+            "type":"string"
+        },
+        "name":{
+            "type":"string"
+        },
+        "location":{
+            "type":"string"
+        },
+        "capacity":{
+            "type":"string"
+        },
+        "onService":{
+            "type":"boolean"
+        },
+        "pricePerHour":{
+            "type":"integer"
+        },
+        "description":{
+            "type":"string"
+        }
+    },
+    "Reservation":{
+        "id":{
+            "type":"string"
+        },
+        "client":{
+            "type":"string"
+        },
+        "reservationPlateNumber":{
+            "type":"string"
+        },
+        "branch":{
+            "type":"string"
+        },
+        "slot":{
+            "type":"integer"
+        },
+        "price":{
+            "type":"string"
+        },
+        "startingTime":{
+            "type":"integer"
+        },
+        "duration":{
+            "type":"integer"
+        }
+    }
+}

@@ -1,0 +1,66 @@
+[
+    {
+        "Name": "Admin",
+        "id": "<string>",
+        "fullName": "<string>",
+        "phone": "<string>",
+        "email": "<string>",
+        "passwordHash": "<string>",
+        "defaultAdmin": "<boolean>"
+    },
+    {
+        "Name": "Client",
+        "id": "<string>",
+        "fullName": "<string>",
+        "phone": "<string>",
+        "email": "<string>",
+        "passwordHash": "<string>",
+        "defaultPlateNumber": "<string>"
+    },
+    {
+        "Name": "Staff",
+        "id": "<string>",
+        "fullName": "<string>",
+        "phone": "<string>",
+        "email": "<string>",
+        "passwordHash": "<string>",
+        "branch": "<string>"
+    },
+    {
+        "Name": "Branch",
+        "id": "<string>",
+        "name": "<string>",
+        "location": "<string>",
+        "capacity": "<integer>",
+        "onService": "<boolean>",
+        "pricePerHour": "<integer>",
+        "description": "<string>"
+    },
+    {
+        "Name": "Reservation",
+        "id": "<string>",
+        "client": "<string>",
+        "reservationPlateNumber": "<string>",
+        "branch": "<string>",
+        "branchName": "<string>",
+        "slot": "<integer>",
+        "price": "<double>",
+        "startingTime": "<integer>",
+        "duration": "<integer>",
+        "parked": "<boolean>",
+        "completed":"<boolean>",
+        "expired":"<boolean>"
+    },
+    {
+        "Name": "Overviews",
+        "adminsCount": "<integer>",
+        "staffsCount": "<integer>",
+        "clientsCount": "<integer>",
+        "branchesCount": "<integer>",
+        "reservationsCount": "<integer>",
+        "dailyAverageReservationCount": "<integer>",
+        "todaysReservationCount": "<integer>",
+        "launchDate": "<string>",
+        "daysOnService": "<integer>"
+    }
+]
