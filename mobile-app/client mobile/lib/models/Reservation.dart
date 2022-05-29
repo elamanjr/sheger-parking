@@ -1,0 +1,14 @@
+// ignore_for_file: file_names
+
+class Reservation{
+  String client;
+  String reservationPlateNumber;
+  String branch;
+  String branchName;
+  int price;
+  int startingTime;
+  int duration;
+
+  Reservation(this.client, this.reservationPlateNumber, this.branch, this.branchName,
+      this.price, this.startingTime, this.duration);
+}

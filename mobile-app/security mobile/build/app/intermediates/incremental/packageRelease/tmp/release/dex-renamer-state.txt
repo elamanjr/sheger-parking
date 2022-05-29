@@ -1,0 +1,4 @@
+#Sun Apr 03 13:42:26 MSK 2022
+base.0=C\:\\Users\\Beka\\AndroidStudioProjects\\sheger_parking_security\\build\\app\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
