@@ -10,11 +10,11 @@ export default function OverviewAction({ overviewData }) {
     </div>
   );
   let data = {
-    average: `${overviewData.dailyAverageReservationCount} reservations served daily on average`,
+    average: `${overviewData.dailyAverageReservationCount != null ? Math.round(((overviewData.dailyAverageReservationCount)*100)/100) : 0} reservations served daily on average`,
   };
 
   return (
-    <div className="content align-middle">
+    <div className="content ">
       <div className="col-12 ">
         <h1 className="mb-4">Overview</h1>
         <div className=" col-12 shadow-xsm ">
@@ -24,7 +24,7 @@ export default function OverviewAction({ overviewData }) {
             nameClass={'ms-2 h4'}
           />
         </div>
-
+        
         <div className="row wellContainerBox">
           <div className="col-sm-3 wellContainer container-fluid">
             <Card

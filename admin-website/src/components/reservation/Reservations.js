@@ -2,10 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ShowReservations } from './reservationActions';
 
+import {baseURL} from '../../sourceData/data';
+
+
 export default function Reservations() {
   let [reservationList, setReservationList] = useState([]);
   let [selectedReservationList, setSelectedReservationList] = useState([]);
 
+
+  
   let [client, setClient] = useState([]);
   let [branches, setBranches] = useState([]);
   let [clientIdVN, setclientIdVN] =useState({});
@@ -13,7 +18,7 @@ export default function Reservations() {
 
   async function FetchReservations() {
     useEffect(() => {
-      fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/reservations', {
+      fetch(`${baseURL}/reservations?includeCompleted=true`, {
         method: 'GET',
       })
         .then((response) => response.json())
@@ -22,7 +27,7 @@ export default function Reservations() {
           setSelectedReservationList(resp);
         });
 
-        fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/branches', {
+        fetch(`${baseURL}/branches`, {
         method: 'GET',
       })
         .then((response) => response.json())
@@ -30,7 +35,7 @@ export default function Reservations() {
             setBranches(resp);
         });
 
-        fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients', {
+        fetch(`${baseURL}/clients`, {
         method: 'GET',
       })
         .then((response) => response.json())

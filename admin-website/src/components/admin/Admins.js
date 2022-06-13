@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { EditAdmin, ShowAdmins, NewAdmin } from './adminActions';
 
+import {baseURL} from '../../sourceData/data'
+
 export default function Admins() {
   let [adminList, setAdminList] = useState([]);
   let [selectedAdminList, setSelectedAdminList] = useState([]);
 
+  // let baseURL = 'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e'
   async function FetchAdmins() {
     useEffect(() => {
-      fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins', {
+      fetch(`${baseURL}/admins`, {
         method: 'GET',
       })
         .then((response) => response.json())

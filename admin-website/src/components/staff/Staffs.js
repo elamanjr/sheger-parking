@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { EditStaff, NewStaff, ShowStaffs } from './staffActions';
 
+import {baseURL} from '../../sourceData/data'
+
+
 export default function Staffs() {
   let [staffList, setStaffList] = useState([]);
   let [selectedStaffList, setSelectedStaffList] = useState([]);
 
   async function FetchAdmins() {
     useEffect(() => {
-      fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/staffs', {
+      fetch(`${baseURL}/staffs`, {
         method: 'GET',
       })
         .then((response) => response.json())

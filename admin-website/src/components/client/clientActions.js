@@ -4,6 +4,9 @@ import Button from '../Button';
 import { UpdateRemoveState } from '../functions/UpdateState';
 import PageHeading from '../PageHeading';
 
+import {baseURL} from '../../sourceData/data'
+import LoadingSpinner from '../LoadingSpinner';
+
 export function ShowClients({
   clientList,
   selectedClientList,
@@ -14,7 +17,7 @@ export function ShowClients({
     { value: 'fullName', name: 'Full Name' },
     { value: 'phone', name: 'Phone' },
     { value: 'email', name: 'Email' },
-    { value: 'defaultPlateNumber', name: 'PlateNumber' },
+    { value: 'defaultPlateNumber', name: 'PlateNo' },
   ];
 
   return (
@@ -27,7 +30,7 @@ export function ShowClients({
         setter={setSelectedClientList}
         elementType={elementType}
       />{' '}
-      <table className="table table-striped">
+      <table className="table table-striped rounded">
         <tbody className="">
           <tr>
             <th>Id</th>
@@ -36,11 +39,19 @@ export function ShowClients({
             <th>Email</th>
             <th>Default PlateNo.</th>
 
-            <th>Password</th>
+            
             <th></th>
           </tr>
         </tbody>
         <tbody id="tableDataField">
+        {selectedClientList.length ===0? <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>{LoadingSpinner()}</td>
+          <td></td>
+          <td></td>
+          </tr> : null}
           {selectedClientList.map((item) => {
             return (
               <tr>
@@ -50,7 +61,7 @@ export function ShowClients({
                 <td>{item.email}</td>
                 <td>{item.defaultPlateNumber}</td>
 
-                <td>{item.passwordHash}</td>
+                
                 <td>
                   <Button
                     color=""
@@ -76,7 +87,7 @@ function DeleteClient(id,selectedClientList,
   let confirmation = window.confirm('you sure you want to delete the client');
 
   if (confirmation) {
-    fetch(`http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients/${id}`, {
+    fetch(`${baseURL}/clients/${id}`, {
       method: 'DELETE',
     }).then((resp) => {
       resp.json();

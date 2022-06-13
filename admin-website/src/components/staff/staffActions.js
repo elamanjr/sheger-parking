@@ -8,7 +8,10 @@ import PageHeading from '../PageHeading';
 import { Hash } from '../functions/Hash';
 import UpdateAddState, { UpdateEditState, UpdateRemoveState } from '../functions/UpdateState';
 
-const baseUrl = 'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/staffs';
+import {baseURL} from '../../sourceData/data'
+import LoadingSpinner from '../LoadingSpinner';
+
+// const baseUrl = 'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/staffs';
 
 export function ShowStaffs({
   staffList,
@@ -34,7 +37,7 @@ export function ShowStaffs({
         setter={setSelectedStaffList}
         elementType={elementType}
       />{' '}
-      <table className="table table-striped">
+      <table className="table table-striped rounded">
         <tbody className="">
           <tr>
             <th>Id</th>
@@ -43,7 +46,7 @@ export function ShowStaffs({
             <th>Email</th>
             <th>Branch</th>
 
-            <th>Password</th>
+            
             <th>
               <Link to="new">
                 <Button
@@ -58,6 +61,15 @@ export function ShowStaffs({
           </tr>
         </tbody>
         <tbody id="tableDataField">
+        <td></td>
+        {selectedStaffList.length ===0? <tr>
+          <td></td>
+          <td></td>
+          <td>{LoadingSpinner()}</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          </tr> : null}
           {selectedStaffList.map((item) => {
             return (
               <tr>
@@ -67,7 +79,7 @@ export function ShowStaffs({
                 <td>{item.email}</td>
                 <td>{item.branch}</td>
 
-                <td>{item.passwordHash}</td>
+                
                 <td>
                   <Link to="edit" state={{ item: item }}>
                     <Button
@@ -84,7 +96,7 @@ export function ShowStaffs({
                     bgColor=""
                     name="Delete"
                     id={item.id}
-                    className="btn deleteButton ms-1"
+                    className="btn deleteButton ms-1 mt-1"
                     onclick={() => DeleteStaff(item.id,selectedStaffList,setSelectedStaffList)}
                   />
                 </td>
@@ -137,7 +149,7 @@ export function NewStaff({
         "branch":branch,
       });
 
-      fetch(`${baseUrl}`, {
+      fetch(`${baseURL}/staffs`, {
         method: 'POST',
         body: bodyContent,
         headers: headersList,
@@ -182,7 +194,7 @@ export function NewStaff({
       <div className="form-group">
         <label for="phone">Phone:</label>
         <input
-          type="tel"
+          type="number"
           className="form-control tel"
           id="phone"
           placeholder="Phone"
@@ -280,7 +292,7 @@ export function DeleteStaff(delId,selectedStaffList,
   let confirmation = window.confirm('you sure you want to delete the staff');
 
   if (confirmation) {
-    fetch(`${baseUrl}/${delId}`, {
+    fetch(`${baseURL}/staffs/${delId}`, {
       method: 'DELETE',
     }).then((resp) => {
       resp.json();
@@ -337,7 +349,7 @@ export function EditStaff({
         branch,
       });
 
-      fetch(`${baseUrl}/${item.id}`, {
+      fetch(`${baseURL}/staffs/${item.id}`, {
         method: 'PATCH',
         body: bodyContent,
         headers: headersList,
@@ -360,7 +372,6 @@ export function EditStaff({
       onSubmit={(e) => {
         editStaffAction();
         e.preventDefault();
-        // console.log(data)
       }}
     >
       <h1 id="formHeader">Edit Admin</h1>
@@ -383,7 +394,7 @@ export function EditStaff({
       <div className="form-group">
         <label for="phone">Phone:</label>
         <input
-          type="tel"
+          type="number"
           className="form-control tel"
           id="phone"
           placeholder="Phone"
