@@ -7,7 +7,7 @@ export default function PageHeading({
   data,
   fullData,
   setter,
-  elementType
+  elementType,
 }) {
   // var searchBy ="id"
   var [searchBy, setSearchBy] = useState('id');
@@ -15,111 +15,101 @@ export default function PageHeading({
   var [sorted, setSorted] = useState([]);
   var [tempData, setTempData] = useState([]);
 
-  var tempdata = []
+  var tempdata = [];
 
-  data.forEach(element => {
-    tempdata.push(element)
-});
+  data.forEach((element) => {
+    tempdata.push(element);
+  });
 
   function Search(searchWord) {
     // alert(searchWord)
     // setter([])
     let result = [];
     fullData.forEach((singleData) => {
-      // console.log((singleData.fullName.toLowerCase()).includes(searchWord.toLowerCase()))
+
       if (
         singleData[searchBy].toLowerCase().includes(searchWord.toLowerCase())
       ) {
-        // console.log(singleData)
+        
         result.push(singleData);
       }
     });
-    // console.log(result)
     setter(result);
   }
 
   useEffect(() => {
     setSorted(tempdata.sort((a, b) => (a[sortBy] > b[sortBy] ? 1 : -1)));
-    console.log(sorted)
     setter([]);
   }, [sortBy]);
 
   useEffect(() => {
     setter(sorted);
-    // console.log(data)
   }, [sorted]);
-
-//     useEffect(() => {
-    //   alert('changed');
-// console.log(data)
-//     }, [data]);
-  return (
-    <div className="row mb-2">
-      <h1 className="col-5 ">List Of {userType} </h1>
-      <div id="searchSortBox" className="col-7 text-center ps-0">
-        <div className="row align-items-center ">
-          <div id="searchBorderBox" className="col-12 border px-0 align-middle">
-            <div className="row ">
-              <div className="col-8">
-                <div className="row">
-                  <div className="col-6   me-0 ">
-                    <label for="searchBy" className="fs-6">
-                      search by:
-                    </label>
-                    <select
-                      onChange={(event) => setSearchBy(event.target.value)}
-                      name="searchBy"
-                      id="searchBy"
-                      className="rounded"
-                    >
-                    {elementType.map((type) => {
-                        return <option value={type.value}>{type.name}</option>
-    
-                        
-                    })}
-                    </select>
-                  </div>
-                  <div className="col-6 ps-0 ms-0">
-                    <div className="row align-middle">
-                      <div className="col-10 px-0 ">
-                        <input
-                          onChange={(event) => Search(event.target.value)}
-                          className="w-100 border-0 rounded px-2 align-middle"
-                          type="text"
-                          name="searchText"
-                          id="searchText"
-                        />
-                      </div>
-                      <div className="col-2">
-                        <i
-                          className="fa-solid fa-magnifying-glass align-middle"
-                          onClick={onclick}
-                        ></i>
-                      </div>
-                    </div>
+return (
+    <div className="column mb-2">
+      <h1 className="row ">List Of {userType} </h1>
+      <div className="row">
+        <div className="col"></div>
+        <div
+          id="searchSortBox"
+          className="col-md-auto text-center ps-0 float-right"
+        >
+          <div className="row align-items-center ">
+            <div
+              id="searchBorderBox"
+              className="col-12 border px-0 align-middle"
+            >
+              <div className="row ">
+                <div className="col-6">
+                  <div className="row px-2">
+                    <i
+                      className="fa-solid fa-magnifying-glass align-middle col-2 mt-1 "
+                      onClick={onclick}
+                    ></i>
+                    <input
+                      onChange={(event) => Search(event.target.value)}
+                      className="w-100 border-0 rounded align-middle col"
+                      type="text"
+                      name="searchText"
+                      id="searchText"
+                    />
                   </div>
                 </div>
-              </div>
-              <div id="sortBox" className="col-4 ">
-                <label for="sortBy" className="fs-6">
-                  sort by:
-                </label>
-                <select
-                  onChange={(event) => {
-                    setSortBy(event.target.value);
+                <div className="col-2 ps-0 ms-0">
+                  <select
+                    onChange={(event) => setSearchBy(event.target.value)}
+                    name="searchBy"
+                    id="searchBy"
+                    className="rounded pb-1"
+                  >
+                    {elementType.map((type) => {
+                      return <option value={type.value}>{type.name}</option>;
+                    })}
+                  </select>
+                </div>
 
-                    // alert(sortBy)
-                  }}
-                  name="sortBy"
-                  id="sortBy"
-                  className="rounded"
-                >{elementType.map((type) => {
-                    return <option value={type.value}>{type.name}</option>
+                <div id="sortBox" className="col-3 ">
+                  <div className="row">
+                    <label for="sortBy" className="fs-6 col-2 me-2">
+                      <i class="fa-solid fa-arrow-down-short-wide "></i>
+                    </label>
 
-                    
-                })}
-                  
-                </select>
+                    <select
+                      onChange={(event) => {
+                        setSortBy(event.target.value);
+
+                        // alert(sortBy)
+                      }}
+                      name="sortBy"
+                      id="sortBy"
+                      className="rounded col"
+                    >
+                      {elementType.map((type) => {
+                        return <option value={type.value}>{type.name}</option>;
+                      })}
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

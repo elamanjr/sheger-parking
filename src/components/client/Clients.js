@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { EditClient, ShowClients } from './clientActions';
 
+import {baseURL} from '../../sourceData/data'
+
+
 export default function Clients() {
   var [clientList, setClientList] = useState([]);
   var [selectedClientList, setSelectedClientList] = useState([]);
 
   async function FetchAdmins() {
     useEffect(() => {
-      fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients', {
+      fetch(`${baseURL}/clients`, {
         method: 'GET',
       })
         .then((response) => response.json())

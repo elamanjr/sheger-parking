@@ -17,7 +17,7 @@ export default class Header extends Component {
 
             <div className="col-6">
               <div className="row flex-nowrap d-flex  ms-4">
-                <div className="col-8"></div>
+                <div className="col"></div>
 
                 <div className="col-2 container headerPageListContainer rounded row me-2 shadow-sm">
                   <Link to="/">
@@ -35,7 +35,7 @@ export default class Header extends Component {
                     <i onClick={() =>{ 
                       localStorage.setItem("loggedIn",false)
                       window.location.reload()}}
-                      class="fa-solid fa-arrow-right-from-bracket h1 col-6"
+                      class="fa-solid fa-arrow-right-from-bracket h3 col-6 mt-2"
                       id="logoutBtn"
                     ></i>
                   </div>

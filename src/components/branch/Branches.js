@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { EditBranch, NewBranch, ShowBranches } from './branchActions';
 
+import {baseURL} from '../../sourceData/data';
+
+
 export default function Branches() {
   var [branchesList, setBranchesList] = useState([]);
   var [selectedBranchesList, setSelectedBranchesList] = useState([]);
 
   async function FetchAdmins() {
     useEffect(() => {
-      fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/branches', {
+      fetch(`${baseURL}/branches`, {
         method: 'GET',
       })
         .then((response) => response.json())

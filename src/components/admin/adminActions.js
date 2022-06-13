@@ -4,14 +4,18 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as ReactDOM from 'react-dom/client';
 
+import {baseURL} from '../../sourceData/data';
+
+
 import ErrorDisplay from '../ErrorDisplay';
 import { CheckApiResponse } from '../functions/CheckApiResponse';
 import { Hash } from '../functions/Hash';
 import PageHeading from '../PageHeading';
 import UpdateAddState, { UpdateEditState, UpdateRemoveState } from '../functions/UpdateState';
+import LoadingSpinner from '../LoadingSpinner';
 
 
-var baseURL = 'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins';
+// var baseURL = 'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins';
 export function ShowAdmins({
   adminList,
   selectedAdminList,
@@ -23,7 +27,7 @@ export function ShowAdmins({
     { value: 'phone', name: 'Phone' },
     { value: 'email', name: 'Email' },
   ];
-  return (
+  return(
     <div className="">
       <PageHeading
         userType="Admins"
@@ -33,14 +37,15 @@ export function ShowAdmins({
         setter={setSelectedAdminList}
         elementType={elementType}
       />
-      <table className="table table-striped">
+      
+      <table className="table table-striped rounded-3">
         <tbody className="">
           <tr>
             <th>Id</th>
             <th>Full Name</th>
             <th>Phone</th>
             <th>Email</th>
-            <th>Password</th>
+            
             <th>
               <Link to="new">
                 <Button
@@ -55,14 +60,22 @@ export function ShowAdmins({
           </tr>
         </tbody>
         <tbody id="tableDataField">
+        {selectedAdminList.length ===0? <tr>
+          <td></td>
+          <td></td>
+          <td>{LoadingSpinner()}</td>
+          <td></td>
+          <td></td>
+          </tr> : null}
           {selectedAdminList.map((item) => {
             return (
+              
               <tr>
                 <td>{item.id}</td>
                 <td>{item.fullName}</td>
                 <td>{item.phone}</td>
                 <td>{item.email}</td>
-                <td>{item.passwordHash}</td>
+                
                 <td>
                   <Link to="edit" state={{ item: item }}>
                     <Button
@@ -78,7 +91,7 @@ export function ShowAdmins({
                     bgColor=""
                     name="Delete"
                     id={item.id}
-                    className="btn deleteButton ms-1"
+                    className="btn deleteButton ms-1 mt-1"
                     onclick={() => DeleteAdmin(item.id,adminList,
                       selectedAdminList,
                       setSelectedAdminList
@@ -92,6 +105,7 @@ export function ShowAdmins({
       </table>
     </div>
   );
+        
 }
 
 export function NewAdmin({
@@ -132,9 +146,9 @@ export function NewAdmin({
         phone: phone,
         email: email,
         passwordHash: finalHash,
-        defaultAdmin: defaultAdmin,
+        defaultAdmin: (defaultAdmin==='true'),
       });
-      fetch('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/admins/', {
+      fetch(`${baseURL}/admins/`, {
         method: 'POST',
         body: bodyContent,
         headers: headersList,
@@ -187,7 +201,7 @@ export function NewAdmin({
       <div className="form-group">
         <label for="phone">Phone:</label>
         <input
-          type="tell"
+          type="number"
           className="form-control tell"
           id="phone"
           placeholder="Phone"
@@ -272,7 +286,7 @@ async function DeleteAdmin(delId,adminList,
   let confirmation = window.confirm('you sure you want to delete the admin');
 
   if (confirmation) {
-    fetch(`${baseURL}/${delId}`, {
+    fetch(`${baseURL}/admins/${delId}`, {
       method: 'DELETE',
     }).then((resp) => {
       resp.json();
@@ -325,15 +339,14 @@ export function EditAdmin({
         phone,
         email,
         passwordHash,
-        defaultAdmin,
+        defaultAdmin : (defaultAdmin==='true'),
       });
 
-      fetch(`${baseURL}/${item.id}`, {
+      fetch(`${baseURL}/admins/${item.id}`, {
         method: 'PATCH',
         body: bodyContent,
         headers: headersList,
       }).then(function (data) {
-        // console.log(data);
         CheckApiResponse(data, data.json());
       });
 
@@ -353,7 +366,6 @@ export function EditAdmin({
       onSubmit={(e) => {
         editAdminAction();
         e.preventDefault();
-        // console.log(data)
       }}
     >
       <h1 id="formHeader">Edit Admin</h1>
@@ -376,7 +388,7 @@ export function EditAdmin({
       <div className="form-group">
         <label for="phone">Phone:</label>
         <input
-          type="tell"
+          type="number"
           className="form-control tell"
           id="phone"
           placeholder="Phone"
