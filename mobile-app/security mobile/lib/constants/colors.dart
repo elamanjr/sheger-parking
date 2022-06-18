@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Col{
- static Color primary = Color(0xFF4EFFBF);
+ static Color primary = Color(0xFF96DA96);
  static Color Onprimary = Color(0xFF56646F);
  static Color background = Color(0xFFFFFFFF);
  static Color Onbackground = Color(0xFF2B2B43);
@@ -9,5 +9,12 @@ class Col{
  static Color Onsurface = Color(0xFF56646F);
  static Color secondary = Color(0xFFCCFFE7);
  static Color textfieldLabel = Color(0xFF545563);
+ static Color blackColor = Color(0xFF4D4D4D);
+ static Color whiteColor = Color(0xFFB5B5B5);
+ static Color linkColor = Color(0xFF00A4BA);
+ static Color deleteColor = Color(0xFFAB0000);
+ static Color gradientColor = Color(0xFF978B4D).withOpacity(0.6);
+ static Color locationgradientColor = Color(0xFF567556);
+ static Color expiredColor = Color(0xFFAB0000).withRed(255);
  static Color? expired = Colors.redAccent[100];
 }

@@ -9,7 +9,7 @@ class ReservationDetails {
   final String slot;
   final int price;
   final int startingTime;
-  final int duration;
+  final double duration;
   bool parked;
   bool completed;
   bool expired;
@@ -29,33 +29,36 @@ class ReservationDetails {
     required this.expired,
   });
 
-  factory ReservationDetails.fromJson(Map<String, dynamic> json) => ReservationDetails(
-    id: json['id'],
-    client: json['client'],
-    reservationPlateNumber: json['reservationPlateNumber'],
-    branch: json['branch'],
-    branchName: json['branchName'],
-    slot: json['slot'],
-    price: json['price'],
-    startingTime: json['startingTime'],
-    duration: json['duration'],
-    parked: json['parked'],
-    completed: json['completed'],
-    expired: json['expired'],
-  );
+  factory ReservationDetails.fromJson(Map<String, dynamic> json) =>
+      ReservationDetails(
+        id: json['id'],
+        client: json['client'],
+        reservationPlateNumber: json['reservationPlateNumber'],
+        branch: json['branch'],
+        branchName: json['branchName'],
+        slot: json['slot'],
+        price: json['price'],
+        startingTime: json['startingTime'],
+        duration: json['duration'] is double
+            ? json['duration']
+            : json['duration'].toDouble(),
+        parked: json['parked'],
+        completed: json['completed'],
+        expired: json['expired'],
+      );
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'client': client,
-    'reservationPlateNumber': reservationPlateNumber,
-    'branch': branch,
-    'branchName': branchName,
-    'slot': slot,
-    'price': price,
-    'startingTime': startingTime,
-    'duration': duration,
-    'parked': parked,
-    'completed': completed,
-    'expired': expired,
-  };
+        'id': id,
+        'client': client,
+        'reservationPlateNumber': reservationPlateNumber,
+        'branch': branch,
+        'branchName': branchName,
+        'slot': slot,
+        'price': price,
+        'startingTime': startingTime,
+        'duration': duration,
+        'parked': parked,
+        'completed': completed,
+        'expired': expired,
+      };
 }

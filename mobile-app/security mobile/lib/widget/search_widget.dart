@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
 
 class SearchWidget extends StatefulWidget {
@@ -26,18 +28,26 @@ class _SearchWidgetState extends State<SearchWidget> {
     final style = widget.text.isEmpty ? styleHint : styleActive;
 
     return Container(
-      height: 42,
+      height: 50,
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         color: Colors.white,
-        border: Border.all(color: Colors.black26),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            offset: Offset(0.0, 1.0), //(x,y)
+            blurRadius: 7.0,
+          ),
+        ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          icon: Icon(Icons.search, color: style.color),
+          icon: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Icon(Icons.search, color: style.color)),
           suffixIcon: widget.text.isNotEmpty
               ? GestureDetector(
                   child: Icon(Icons.close, color: style.color),
