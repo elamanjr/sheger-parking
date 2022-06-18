@@ -10,13 +10,15 @@ const {
     getDocument,
     getDocuments,
     updateDocument,
-    deleteDocument } = require("../commons/functions");
+    deleteDocument, 
+    deleteDocuments} = require("../commons/functions");
 const {
     collectionNames,
     requireParamsNotSet,
     invalidId,
     userPhoneAlreadyInUse,
-    userEmailAlreadyInUse } = require("../commons/variables.js");
+    userEmailAlreadyInUse,
+    unitDurationInMinutes } = require("../commons/variables.js");
 
 /**
  * A class to model a client/customer
@@ -218,6 +220,7 @@ class Client extends User {
             }
             try {
                 let result = await deleteDocument(collectionNames.clients, { _id });
+                await deleteDocuments(collectionNames.reservations, { client:id });
                 return result.deletedCount;
             } catch (error) {
                 throw error;
@@ -228,19 +231,48 @@ class Client extends User {
     /**
     * Gets all reservations by a client.
     */
-    static async getAllReservations({ id, sort = {} }) {
+    static async getAllReservations({ id, sort = { "startingTime": 1 },includeCompleted=false }) {
         if (_.isUndefined(id)) {
             throw new Error(requireParamsNotSet);
         } else {
             try {
-                let reservations = await getDocuments(collectionNames.reservations, { client: id }, sort);
-                let allReservations = []
-                await reservations.forEach(reservation => {
+                let reservations = await (await getDocuments(collectionNames.reservations, { client: id }, sort)).toArray();
+                let allReservations = [];
+                for (let index = 0; index < reservations.length; index++) {
+                    let reservation = reservations[index];
+                    if (!reservation.completed && !reservation.parked && Date.now() > reservation.startingTime + reservation.duration * unitDurationInMinutes * 60 * 1000) {
+                        try {
+                            // @ts-ignore
+                            reservation.completed = true;
+                            // @ts-ignore
+                            await Reservation.update({ id: reservation.id, updates: { completed: true } });
+                        } catch (error) {
+                            throw error;
+                        }
+                    }
+                    if (!includeCompleted && reservation.completed) continue;
                     reservation.id = reservation._id + "";
                     delete reservation._id;
                     // @ts-ignore
                     allReservations.push(new Reservation(reservation));
-                });
+                }
+                // reservations.forEach(reservation => {
+                //     if (!reservation.completed && !reservation.parked && Date.now() > reservation.startingTime + reservation.duration * unitDurationInMinutes * 60 * 1000) {
+                //         try {
+                //             // @ts-ignore
+                //             reservation.completed = true;
+                //             // @ts-ignore
+                //             await Reservation.update({ id: reservation.id, updates: { completed: true } });
+                //         } catch (error) {
+                //             throw error;
+                //         }
+                //     }
+                //     if (reservation.completed) return;
+                //     reservation.id = reservation._id + "";
+                //     delete reservation._id;
+                //     // @ts-ignore
+                //     allReservations.push(new Reservation(reservation));
+                // });
                 return allReservations;
             } catch (error) {
                 throw error;

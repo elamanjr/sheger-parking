@@ -1,4 +1,4 @@
-
+const _ = require("lodash");
 const express = require("express");
 const { errorLog,
     httpSingleResponse,
@@ -6,8 +6,10 @@ const { errorLog,
     httpNotFoundResponse } = require("../../modules/commons/functions.js");
 const {
     invalidCallRegex,
-    noAvailableSlot } = require("../../modules/commons/variables.js");
-const Reservation = require("../../modules/entities/reservation.js")
+    noAvailableSlot,
+    requireParamsNotSet } = require("../../modules/commons/variables.js");
+const Reservation = require("../../modules/entities/reservation.js");
+const Branch = require("../../modules/entities/branch.js");
 const reservations = express.Router();
 
 /**
@@ -30,8 +32,9 @@ const reservations = express.Router();
  *       description: Internal error
  */
 reservations.get("/", async (req, res) => {
+    let includeCompleted = !!req.query.includeCompleted;
     try {
-        let allReservations = await Reservation.getAll();
+        let allReservations = await Reservation.getAll(includeCompleted);
         res.status(200).end(JSON.stringify(allReservations));
     } catch (error) {
         if (error.message.match(invalidCallRegex)) {
@@ -125,6 +128,57 @@ reservations.post("/", async (req, res) => {
         }
     }
 })
+
+/**
+ * @swagger
+ * /{token}/availability:
+ *  post:
+ *   description: Checks if there is available slot given branch, startingTime and duration
+ *   parameters:
+ *     - in: path
+ *       name: token
+ *       required: true
+ *   requestBody:
+ *     description: branch, startingTime, duration
+ *     required: true
+ *   tags:
+ *     - Reservations
+ *   responses:
+ *     200:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               slotAvailable:
+ *                 type: boolean
+ *                 example: true
+ *     400:
+ *       description: Invalid/incomplete parameters
+ *     500:
+ *       description: Internal error
+ */
+reservations.post("/availability", async (req, res) => {
+    let { branch, startingTime, duration } = req.body;
+    if (
+        _.isUndefined(branch) ||
+        _.isUndefined(startingTime) ||
+        _.isUndefined(duration)) {
+        httpSingleResponse(res, 400, requireParamsNotSet);
+    } else {
+        try {
+            let availableSlot = await Branch.getAvailableSlot(branch, startingTime, duration);
+            res.status(200).end(JSON.stringify({ slotAvailable: availableSlot > 0 }));
+        } catch (error) {
+            if (error.message.match(invalidCallRegex)) {
+                httpSingleResponse(res, 400, error.message);
+            } else {
+                errorLog("ERROR: Checking if there is available slot", error);
+                httpInternalErrorResponse(res);
+            }
+        }
+    }
+});
 
 /**
  * @swagger

@@ -47,7 +47,7 @@ overviews.get("/", async (req, res) => {
             errorLog(`ERROR: Getting ${entity}Count`, error);
         }
     }
-    overviewsJson["dailyAverageReservationCount"] = overviewsJson["reservationsCount"] / overviewsJson["daysOnService"];
+    overviewsJson["dailyAverageReservationCount"] = Math.round(overviewsJson["reservationsCount"]*100 / overviewsJson["daysOnService"])/100;
     try {
         // @ts-ignore
         overviewsJson["todaysReservationCount"] = await getCount(collectionNames.reservations, { startingTime: { $gt: todayStartsAt, $lt: todayEndsAt } })

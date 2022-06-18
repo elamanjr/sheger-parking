@@ -152,13 +152,15 @@ class Reservation {
     /**
     * Gets all reservations in the system.
     */
-    static async getAll() {
+    static async getAll(includeCompleted) {
+        includeCompleted = !!includeCompleted;
         try {
-            let reservations = await getDocuments(collectionNames.reservations);
+            let reservations = await getDocuments(collectionNames.reservations, {}, { "startingTime": 1 });
             let tempAllReservations = []
             let allReservations = []
 
             await reservations.forEach(reservation => {
+                if (!includeCompleted && reservation.completed) return;
                 reservation.id = reservation._id + "";
                 delete reservation._id;
                 // @ts-ignore
@@ -171,6 +173,7 @@ class Reservation {
                         reservation.completed = true;
                         // @ts-ignore
                         await Reservation.update({ id: reservation.id, updates: { completed: true } });
+                        if(!includeCompleted) continue;
                     } catch (error) {
                         throw error;
                     }

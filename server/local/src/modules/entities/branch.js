@@ -10,7 +10,8 @@ const {
     getDocuments,
     updateDocument,
     deleteDocument,
-    createDurationArray } = require("../commons/functions");
+    createDurationArray, 
+    deleteDocuments} = require("../commons/functions");
 const {
     collectionNames,
     requireParamsNotSet,
@@ -18,7 +19,8 @@ const {
     defaultPricePerHour,
     defaultCapacity,
     defaultOnServiceStatus,
-    branchNameAlreadyInUse } = require("../commons/variables.js");
+    branchNameAlreadyInUse,
+    unitDurationInMinutes } = require("../commons/variables.js");
 
 /**
  * A class to model a branch
@@ -186,6 +188,7 @@ class Branch {
             }
             try {
                 let result = await deleteDocument(collectionNames.branches, { _id });
+                await deleteDocuments(collectionNames.reservations, { branch:id });
                 return result.deletedCount;
             } catch (error) {
                 throw error;
@@ -196,19 +199,31 @@ class Branch {
     /**
     * Gets all reservations at a branch.
     */
-    static async getAllReservations({ id, sort = {} }) {
+    static async getAllReservations({ id, sort = { "startingTime": 1 },includeCompleted = false }) {
         if (_.isUndefined(id)) {
             throw new Error(requireParamsNotSet);
         } else {
             try {
-                let reservations = await getDocuments(collectionNames.reservations, { branch: id}, sort );
+                let reservations = await (await getDocuments(collectionNames.reservations, { branch: id }, sort)).toArray();
                 let allReservations = []
-                await reservations.forEach(reservation => {
+                for (let index = 0; index < reservations.length; index++) {
+                    let reservation = reservations[index];
+                    if (!reservation.completed && !reservation.parked && Date.now() > reservation.startingTime + reservation.duration * unitDurationInMinutes * 60 * 1000) {
+                        try {
+                            // @ts-ignore
+                            reservation.completed = true;
+                            // @ts-ignore
+                            await Reservation.update({ id: reservation.id, updates: { completed: true } });
+                        } catch (error) {
+                            throw error;
+                        }
+                    }
+                    if (!includeCompleted && reservation.completed) continue;
                     reservation.id = reservation._id + "";
                     delete reservation._id;
                     // @ts-ignore
                     allReservations.push(new Reservation(reservation));
-                });
+                }
                 return allReservations;
             } catch (error) {
                 throw error;
@@ -221,6 +236,7 @@ class Branch {
         let branch, reservations;
         try {
             branch = await Branch.get({ id });
+            // @ts-ignore
             reservations = await Branch.getAllReservations({ id, sort: { slot: 1 } });
         } catch (error) {
             throw error;
@@ -232,6 +248,7 @@ class Branch {
         }
         try {
             for (let reservation of reservations) {
+                if (reservation.completed) continue;
                 if (_.isEmpty(slotMap[reservation.slot])) {
                     slotMap[reservation.slot] = [];
                 }

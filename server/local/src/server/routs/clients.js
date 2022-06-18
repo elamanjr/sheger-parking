@@ -7,7 +7,7 @@ const { errorLog,
     httpNotFoundResponse,
     sendEmailVerificationCode,
     checkExistence } = require("../../modules/commons/functions.js");
-const { invalidCallRegex, collectionNames, userPhoneAlreadyInUse, requireParamsNotSet, userEmailNotInUse } = require("../../modules/commons/variables.js");
+const { invalidCallRegex, collectionNames, userPhoneAlreadyInUse, requireParamsNotSet, userEmailNotInUse, userEmailAlreadyInUse } = require("../../modules/commons/variables.js");
 const Client = require("../../modules/entities/client.js")
 
 const clients = express.Router();
@@ -63,8 +63,13 @@ clients.post("/signup", async (req, res) => {
             if (clientPhoneIsInUse) {
                 httpSingleResponse(res, 400, userPhoneAlreadyInUse);
             } else {
-                let emailVerificationCode = await sendEmailVerificationCode(email, "signup");
-                res.status(200).end(JSON.stringify({ emailVerificationCode }));
+                let clientEmailIsInUse = await checkExistence(collectionNames.clients, { email });
+                if (clientEmailIsInUse) {
+                    httpSingleResponse(res, 400, userEmailAlreadyInUse);
+                } else {
+                    let emailVerificationCode = await sendEmailVerificationCode(email, "signup");
+                    res.status(200).end(JSON.stringify({ emailVerificationCode }));
+                }
             }
         } catch (error) {
             if (error.message.match(invalidCallRegex)) {
@@ -423,9 +428,10 @@ clients.delete("/:id", async (req, res) => {
  *       description: Internal error
  */
 clients.get("/:id/reservations", async (req, res) => {
+    let includeCompleted = !!req.query.includeCompleted;
     let id = req.params.id;
     try {
-        let reservations = await Client.getAllReservations({ id });
+        let reservations = await Client.getAllReservations({ id,includeCompleted });
         res.status(200).end(JSON.stringify(reservations));
     } catch (error) {
         if (error.message.match(invalidCallRegex)) {

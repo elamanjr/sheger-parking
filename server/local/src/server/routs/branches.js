@@ -234,9 +234,10 @@ branches.delete("/:id", async (req, res) => {
  *       description: Internal error
  */
 branches.get("/:id/reservations", async (req, res) => {
+    let includeCompleted = !!req.query.includeCompleted;
     let id = req.params.id;
     try {
-        let reservations = await Branch.getAllReservations({ id });
+        let reservations = await Branch.getAllReservations({ id, includeCompleted });
         res.status(200).end(JSON.stringify(reservations));
     } catch (error) {
         if (error.message.match(invalidCallRegex)) {

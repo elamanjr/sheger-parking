@@ -5,7 +5,6 @@ const nodemailer = require('nodemailer');
 const _ = require("lodash");
 const { MongoClient } = require("mongodb");
 const color = require("cli-color");
-// const Branch = require("../entities/branch.js")
 const { databaseName,
     requireParamsNotSet,
     emailVerificationCodeLength,

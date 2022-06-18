@@ -1,7 +1,6 @@
 
 const express = require("express");
 const morgan = require("morgan");
-const localtunnel = require('localtunnel'); 
 const color = require("cli-color");
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
@@ -13,8 +12,7 @@ const {
     hostUrl,
     basePath,
     publicFilesPath,
-    pageNotFound,
-    subdomain } = require("../modules/commons/variables");
+    pageNotFound } = require("../modules/commons/variables");
 const {
     httpSingleResponse } = require("../modules/commons/functions");
 const clients = require("./routs/clients");
@@ -23,6 +21,8 @@ const reservations = require("./routs/reservations");
 const admins = require("./routs/admins");
 const staffs = require("./routs/staffs");
 const overviews = require("./routs/overviews");
+const payment = require("./routs/payment");
+const afterPayment = require("./routs/after_payment");
 
 require("dotenv").config();
 
@@ -45,11 +45,16 @@ swaggerOptions.swaggerDefinition.servers.push(
         url: hostUrlWithPort
     }
 )
+
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 app.get("/entities", (req, res) => {
     res.end(JSON.stringify(entities))
-})
+});
+
+app.use("/afterpayment",afterPayment);
+
 app.use(express.static(publicFilesPath));
 
 app.use(basePath, (req, res, next) => {
@@ -64,6 +69,7 @@ app.use(basePath + "/branches", branches);
 app.use(basePath + "/reservations", reservations);
 app.use(basePath + "/admins", admins);
 app.use(basePath + "/staffs", staffs);
+app.use(basePath + "/payment", payment);
 app.use(basePath + "/overviews", overviews);
 
 app.use((req, res) => {
@@ -76,9 +82,4 @@ console.log(color.magenta("Serving the app..."))
 app.listen(port, async () => {
     console.log(`App served at:`, color.blue(hostUrlWithPort));
     console.log()
-    // console.log(color.magenta("Serving to public host..."))
-    // // @ts-ignore
-    // let tunnel = await localtunnel({ port, subdomain });
-    // console.log(`App served (public):`, color.blue(`${tunnel.url}`));
-    // console.log()
 })

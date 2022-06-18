@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node src/server/server",
-    "start_dev": "nodemon src/server/server"
+    "dev": "nodemon src/server/server"
   },
   "keywords": [],
   "author": "",
