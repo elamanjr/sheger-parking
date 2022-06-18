@@ -3,14 +3,17 @@
 
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sheger_parking/bloc/home_bloc.dart';
+import 'package:sheger_parking/constants/api.dart';
 import 'package:sheger_parking/models/User.dart';
 import 'package:sheger_parking/pages/HomePage.dart';
 import 'package:sheger_parking/pages/LoginPage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:crypto/crypto.dart';
 
 import '../constants/colors.dart';
 import '../constants/strings.dart';
@@ -26,15 +29,20 @@ class _SignUpPageState extends State<SignUpPage> {
   bool isDataEntered = false;
   bool isProcessing = false;
   late String verificationCode;
-
   String? hashedPassword;
+  String? phoneInUse;
+  String? emailInUse;
+  bool socketError = false;
+
+  bool phoneExists = false;
 
   Future verify() async {
-    var headersList = {
-      'Accept': '*/*',
-      'Content-Type': 'application/json'
-    };
-    var url = Uri.parse('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients/signup');
+    setState(() {
+      isProcessing = true;
+    });
+
+    var headersList = {'Accept': '*/*', 'Content-Type': 'application/json'};
+    var url = Uri.parse('${base_url}/clients/signup');
 
     var body = {
       "fullName": user.fullName,
@@ -44,30 +52,53 @@ class _SignUpPageState extends State<SignUpPage> {
       "defaultPlateNumber": user.defaultPlateNumber
     };
 
-    var req = http.Request('POST', url);
-    req.headers.addAll(headersList);
-    req.body = json.encode(body);
+    setState(() {
+      socketError = false;
+      phoneInUse = "PHONE DOES NOT EXIST";
+    });
 
-    var res = await req.send();
-    final resBody = await res.stream.bytesToString();
+    try {
+      var req = http.Request('POST', url);
+      req.headers.addAll(headersList);
+      req.body = json.encode(body);
 
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      var verificationCode = json.decode(resBody);
-      print(verificationCode["emailVerificationCode"]);
-      this.verificationCode = verificationCode["emailVerificationCode"].toString();
-      print(resBody);
-    }
-    else {
-      print(res.reasonPhrase);
+      var res = await req.send();
+      final resBody = await res.stream.bytesToString();
+
+      setState(() {
+        socketError = false;
+      });
+
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        var verificationCode = json.decode(resBody);
+
+        this.verificationCode =
+            verificationCode["emailVerificationCode"].toString();
+        setState(() {
+          phoneExists = true;
+          isDataEntered = !isDataEntered;
+          emailInUse = "EMAIL DOES NOT EXIST";
+          isProcessing = false;
+        });
+      } else {
+        var exists = json.decode(resBody);
+        setState(() {
+          phoneInUse = exists["message"].toString();
+          emailInUse = exists["message"].toString();
+          isProcessing = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isProcessing = false;
+        socketError = true;
+      });
     }
   }
 
-  Future save() async {
-    var headersList = {
-      'Accept': '*/*',
-      'Content-Type': 'application/json'
-    };
-    var url = Uri.parse('http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/clients');
+  Future signup() async {
+    var headersList = {'Accept': '*/*', 'Content-Type': 'application/json'};
+    var url = Uri.parse('${base_url}/clients');
 
     var body = {
       "fullName": user.fullName,
@@ -76,35 +107,56 @@ class _SignUpPageState extends State<SignUpPage> {
       "passwordHash": hashedPassword,
       "defaultPlateNumber": user.defaultPlateNumber
     };
-    var req = http.Request('POST', url);
-    req.headers.addAll(headersList);
-    req.body = json.encode(body);
 
-    var res = await req.send();
-    final resBody = await res.stream.bytesToString();
+    try {
+      var req = http.Request('POST', url);
+      req.headers.addAll(headersList);
+      req.body = json.encode(body);
 
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      var data = json.decode(resBody);
-      String id = data["id"].toString();
-      String fullName = data["fullName"].toString();
-      String phone = data["phone"].toString();
-      String email = data["email"].toString();
-      String passwordHash = data["passwordHash"].toString();
-      String defaultPlateNumber = data["defaultPlateNumber"].toString();
+      var res = await req.send();
+      final resBody = await res.stream.bytesToString();
 
-      final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      sharedPreferences.setString("id", id);
-      sharedPreferences.setString("fullName", fullName);
-      sharedPreferences.setString("phone", phone);
-      sharedPreferences.setString("email", email);
-      sharedPreferences.setString("passwordHash", passwordHash);
-      sharedPreferences.setString("defaultPlateNumber", defaultPlateNumber);
+      setState(() {
+        socketError = false;
+      });
 
-      print(resBody);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(id: id, fullName: fullName, phone: phone, email: email, passwordHash: passwordHash, defaultPlateNumber: defaultPlateNumber)));
-    }
-    else {
-      print(res.reasonPhrase);
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        var data = json.decode(resBody);
+        String id = data["id"].toString();
+        String fullName = data["fullName"].toString();
+        String phone = data["phone"].toString();
+        String email = data["email"].toString();
+        String passwordHash = data["passwordHash"].toString();
+        String defaultPlateNumber = data["defaultPlateNumber"].toString();
+        Strings.userId = id;
+
+        final SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.setString("id", id);
+        sharedPreferences.setString("fullName", fullName);
+        sharedPreferences.setString("phone", phone);
+        sharedPreferences.setString("email", email);
+        sharedPreferences.setString("passwordHash", passwordHash);
+        sharedPreferences.setString("defaultPlateNumber", defaultPlateNumber);
+
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                    create: (context) => CurrentIndexBloc(),
+                    child: HomePage(
+                        id: id,
+                        fullName: fullName,
+                        phone: phone,
+                        email: email,
+                        passwordHash: passwordHash,
+                        defaultPlateNumber: defaultPlateNumber))),
+            (Route<dynamic> route) => false);
+      } else {}
+    } catch (e) {
+      setState(() {
+        socketError = true;
+      });
     }
   }
 
@@ -118,7 +170,7 @@ class _SignUpPageState extends State<SignUpPage> {
       body: ListView(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(15, 10, 0, 0),
+            padding: EdgeInsets.fromLTRB(15, 40, 0, 0),
             child: Text(
               Strings.app_title,
               style: TextStyle(
@@ -151,12 +203,12 @@ class _SignUpPageState extends State<SignUpPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.fromLTRB(15, 20, 0, 0),
+                    padding: EdgeInsets.fromLTRB(15, 35, 0, 0),
                     child: Text(
                       Strings.signup,
                       style: TextStyle(
                         color: Col.Onbackground,
-                        fontSize: 50,
+                        fontSize: 35,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Nunito',
                         letterSpacing: 0.1,
@@ -164,12 +216,12 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(25, 50, 25, 0),
+                    padding: EdgeInsets.fromLTRB(25, 10, 25, 0),
                     child: Container(
                       alignment: Alignment.center,
                       child: TextFormField(
                         controller: TextEditingController(text: user.fullName),
-                        onChanged: (value){
+                        onChanged: (value) {
                           user.fullName = value;
                         },
                         validator: (value) {
@@ -207,7 +259,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       alignment: Alignment.center,
                       child: TextFormField(
                         controller: TextEditingController(text: user.email),
-                        onChanged: (value){
+                        onChanged: (value) {
                           user.email = value;
                         },
                         validator: (value) {
@@ -245,23 +297,41 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                   ),
+                  (emailInUse == "INVALID_CALL:|:USER_EMAIL_ALREADY_IN_USE")
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Center(
+                            child: Text(
+                              "Email already in use",
+                              style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
                   Padding(
                     padding: EdgeInsets.fromLTRB(25, 15, 25, 0),
                     child: Container(
                       alignment: Alignment.center,
                       child: TextFormField(
                         controller: TextEditingController(text: user.phone),
-                        onChanged: (value){
+                        onChanged: (value) {
                           user.phone = value;
                         },
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "This field can not be empty";
+                          } else if (RegExp(r"^(?:[+0]9)?[0-9]{10}$")
+                              .hasMatch(value)) {
+                            return null;
+                          } else {
+                            return "Please enter valid phone number";
                           }
-                          return null;
                         },
                         decoration: InputDecoration(
-                          hintText: "",
+                          hintText: "Format: 0987654321",
                           hintStyle: TextStyle(
                             color: Col.textfieldLabel,
                             fontSize: 14,
@@ -283,13 +353,28 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                   ),
+                  (phoneInUse == "INVALID_CALL:|:USER_PHONE_ALREADY_IN_USE")
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Center(
+                            child: Text(
+                              "Phone already in use",
+                              style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
                   Padding(
                     padding: EdgeInsets.fromLTRB(25, 15, 25, 0),
                     child: Container(
                       alignment: Alignment.center,
                       child: TextFormField(
-                        controller: TextEditingController(text: user.defaultPlateNumber),
-                        onChanged: (value){
+                        controller: TextEditingController(
+                            text: user.defaultPlateNumber),
+                        onChanged: (value) {
                           user.defaultPlateNumber = value;
                         },
                         validator: (value) {
@@ -306,7 +391,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             fontFamily: 'Nunito',
                             letterSpacing: 0.1,
                           ),
-                          labelText: "Plate Number",
+                          labelText: "Default Plate Number",
                           labelStyle: TextStyle(
                             color: Col.textfieldLabel,
                             fontSize: 14,
@@ -326,8 +411,9 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: Container(
                       alignment: Alignment.center,
                       child: TextFormField(
-                        controller: TextEditingController(text: user.passwordHash),
-                        onChanged: (value){
+                        controller:
+                            TextEditingController(text: user.passwordHash),
+                        onChanged: (value) {
                           var bytes = utf8.encode(value);
                           var sha512 = sha256.convert(bytes);
                           var hashedPassword = sha512.toString();
@@ -337,7 +423,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "This field can not be empty";
-                          } else if (value.length <= 6) {
+                          } else if (value.length < 6) {
                             return "Password should be at least 6 characters";
                           }
                           return null;
@@ -412,7 +498,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           return "This field can not be empty";
-                                        }else if(value != verificationCode){
+                                        } else if (value != verificationCode) {
                                           return "Please enter the correct verification code";
                                         }
                                         return null;
@@ -445,50 +531,71 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                             )
                           : Text(""),
+                  (socketError)
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Center(
+                            child: Text(
+                              "There is an internet connection problem",
+                              style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(25, 50, 25, 0),
+                    padding: EdgeInsets.fromLTRB(25, 15, 25, 0),
                     child: Container(
                       width: double.infinity,
-                      child: RaisedButton(
-                        color: Col.primary,
-                        child: Text(
-                          isDataEntered ? "Verify" : "Register",
-                          style: TextStyle(
-                            color: Col.Onprimary,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Nunito',
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        onPressed: () {
-                          verify();
-                          if (_formKey.currentState!.validate()) {
-                            setState(() {
-                              isDataEntered = !isDataEntered;
-                            });
-                            setState(() {
-                              isProcessing = true;
-                            });
-                            if (!isDataEntered) {
-                              save();
-                            }
-                          } else {
-                            print("Enter fields");
-                          }
-                          Future.delayed(Duration(seconds: 6), () {
-                            setState(() {
-                              isProcessing = false;
-                            });
-                          });
-                        },
-                      ),
+                      child: isDataEntered
+                          ? RaisedButton(
+                              color: Col.primary,
+                              child: Text(
+                                "Verify",
+                                style: TextStyle(
+                                  color: Col.Onprimary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Nunito',
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  signup();
+                                } else {}
+                              },
+                            )
+                          : RaisedButton(
+                              color: Col.primary,
+                              child: Text(
+                                "Sign up",
+                                style: TextStyle(
+                                  color: Col.Onprimary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Nunito',
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              onPressed: isProcessing
+                                  ? null
+                                  : () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        await verify();
+                                      } else {}
+                                    },
+                            ),
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(25, 20, 25, 40),
+                    padding: EdgeInsets.fromLTRB(25, 10, 25, 40),
                     child: Container(
                       width: double.infinity,
                       child: Center(
@@ -497,8 +604,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             children: [
                               TextSpan(
                                   style: TextStyle(
-                                    color: Col.Onbackground,
-                                    fontSize: 18,
+                                    color: Col.blackColor,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'Nunito',
                                     letterSpacing: 0.3,
@@ -507,15 +614,15 @@ class _SignUpPageState extends State<SignUpPage> {
                               TextSpan(
                                   style: TextStyle(
                                     color: Col.primary,
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'Nunito',
                                     letterSpacing: 0.3,
                                   ),
-                                  text: " Login",
+                                  text: " Sign in",
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      Navigator.push(
+                                      Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
