@@ -6,7 +6,7 @@ export default function LoadingSpinner() {
    
 
   return (
-    <div className='text-center '>
+    <div className='text-center'>
       <div className="spinner-container">
         <div className="loading-spinner "></div>
       </div>

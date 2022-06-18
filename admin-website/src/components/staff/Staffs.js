@@ -9,6 +9,10 @@ export default function Staffs() {
   let [staffList, setStaffList] = useState([]);
   let [selectedStaffList, setSelectedStaffList] = useState([]);
 
+  let [branches, setBranches] = useState([]);
+  let [branchIdVN, setbranchIdVN] =useState({});
+
+
   async function FetchAdmins() {
     useEffect(() => {
       fetch(`${baseURL}/staffs`, {
@@ -20,7 +24,27 @@ export default function Staffs() {
           setSelectedStaffList(resp);
         });
     }, []);
+
+    fetch(`${baseURL}/branches`, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((resp) => {
+          setBranches(resp);
+      });
+  
+    //   useEffect(() => {
+    //     var branchDict = {}
+    //     branches.map((item)=>{
+    //         branchDict[item.id]=item.name;
+    //     })
+    //     setbranchIdVN(branchDict)
+  
+      
+    // },[branches])
   }
+
+  
 
   FetchAdmins();
 
@@ -28,6 +52,10 @@ export default function Staffs() {
     FetchAdmins();
   }, 60000);
 
+  
+
+  // console.log("hello")
+  // console.log(branches)
   return (
     <Routes>
       <Route
@@ -38,6 +66,7 @@ export default function Staffs() {
             staffList={staffList}
             selectedStaffList={selectedStaffList}
             setSelectedStaffList={setSelectedStaffList}
+            branchIdVN={branchIdVN}
           />
         }
       />
@@ -48,6 +77,8 @@ export default function Staffs() {
             staffList={staffList}
             selectedStaffList={selectedStaffList}
             setSelectedStaffList={setSelectedStaffList}
+            branchIdVN={branchIdVN}
+            branches={branches}
           />
         }
       />
@@ -58,6 +89,7 @@ export default function Staffs() {
             staffList={staffList}
             selectedStaffList={selectedStaffList}
             setSelectedStaffList={setSelectedStaffList}
+            branches ={branches}
           />
         }
       />

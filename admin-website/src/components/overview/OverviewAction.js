@@ -1,5 +1,6 @@
 import React from 'react';
 import Card from '../Card';
+import LoadingSpinner from '../LoadingSpinner';
 
 export default function OverviewAction({ overviewData }) {
   var totalReservation = (
@@ -14,9 +15,10 @@ export default function OverviewAction({ overviewData }) {
   };
 
   return (
+    
     <div className="content ">
       <div className="col-12 ">
-        <h1 className="mb-4">Overview</h1>
+        <h1 className="mb-4">Overview</h1> {overviewData.length == 0? <div className='mb-4'>{LoadingSpinner()}</div>:null}
         <div className=" col-12 shadow-xsm ">
           <Card
             name="Sheger Parking"

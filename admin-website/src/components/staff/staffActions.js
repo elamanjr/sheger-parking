@@ -1,15 +1,20 @@
 import Button from '../Button';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ErrorDisplay from '../ErrorDisplay';
 import * as ReactDOM from 'react-dom/client';
 import { CheckApiResponse } from '../functions/CheckApiResponse';
 import PageHeading from '../PageHeading';
 import { Hash } from '../functions/Hash';
-import UpdateAddState, { UpdateEditState, UpdateRemoveState } from '../functions/UpdateState';
+import UpdateAddState, {
+  UpdateEditState,
+  UpdateRemoveState,
+} from '../functions/UpdateState';
 
-import {baseURL} from '../../sourceData/data'
+import { baseURL } from '../../sourceData/data';
 import LoadingSpinner from '../LoadingSpinner';
+
+import Select from 'react-select';
 
 // const baseUrl = 'http://127.0.0.1:5000/token:qwhu67fv56frt5drfx45e/staffs';
 
@@ -17,6 +22,7 @@ export function ShowStaffs({
   staffList,
   selectedStaffList,
   setSelectedStaffList,
+  branchIdVN,
 }) {
   var elementType = [
     { value: 'id', name: 'ID' },
@@ -24,7 +30,6 @@ export function ShowStaffs({
     { value: 'phone', name: 'Phone' },
     { value: 'email', name: 'Email' },
     { value: 'branch', name: 'Branch' },
-
   ];
 
   return (
@@ -46,7 +51,6 @@ export function ShowStaffs({
             <th>Email</th>
             <th>Branch</th>
 
-            
             <th>
               <Link to="new">
                 <Button
@@ -61,15 +65,17 @@ export function ShowStaffs({
           </tr>
         </tbody>
         <tbody id="tableDataField">
-        <td></td>
-        {selectedStaffList.length ===0? <tr>
           <td></td>
-          <td></td>
-          <td>{LoadingSpinner()}</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          </tr> : null}
+          {selectedStaffList.length === 0 ? (
+            <tr>
+              <td></td>
+              <td></td>
+              <td>{LoadingSpinner()}</td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          ) : null}
           {selectedStaffList.map((item) => {
             return (
               <tr>
@@ -77,9 +83,8 @@ export function ShowStaffs({
                 <td>{item.fullName}</td>
                 <td>{item.phone}</td>
                 <td>{item.email}</td>
-                <td>{item.branch}</td>
+                <td>{branchIdVN[item.branch]}</td>
 
-                
                 <td>
                   <Link to="edit" state={{ item: item }}>
                     <Button
@@ -97,7 +102,13 @@ export function ShowStaffs({
                     name="Delete"
                     id={item.id}
                     className="btn deleteButton ms-1 mt-1"
-                    onclick={() => DeleteStaff(item.id,selectedStaffList,setSelectedStaffList)}
+                    onclick={() =>
+                      DeleteStaff(
+                        item.id,
+                        selectedStaffList,
+                        setSelectedStaffList
+                      )
+                    }
                   />
                 </td>
               </tr>
@@ -112,16 +123,19 @@ export function ShowStaffs({
 export function NewStaff({
   staffList,
   selectedStaffList,
-  setSelectedStaffList
+  setSelectedStaffList,
+  branchIdVN,
+  branches,
 }) {
-
-  const [id, setId] = useState("to be assigned");
+  const [id, setId] = useState('to be assigned');
   const [fullName, setFullName] = useState();
   const [phone, setPhone] = useState();
   const [email, setEmail] = useState();
   const [passwordHash, setPasswordHash] = useState();
   const [confirmpsdd, setconfirmpsdd] = useState();
   const [branch, setBranch] = useState();
+
+  const [branchOptions, setBranchOptions] = useState([]);
 
   async function newStaffAction() {
     if (confirmpsdd != passwordHash) {
@@ -138,15 +152,15 @@ export function NewStaff({
         'Content-Type': 'application/json',
       };
 
-      let finalHash= await Hash(passwordHash)
+      let finalHash = await Hash(passwordHash);
 
       let bodyContent = JSON.stringify({
-        "id":id,
-        "fullName":fullName,
-        "phone":phone,
-        "email":email,
-        "passwordHash":finalHash,
-        "branch":branch,
+        id: id,
+        fullName: fullName,
+        phone: phone,
+        email: email,
+        passwordHash: finalHash,
+        branch: branch,
       });
 
       fetch(`${baseURL}/staffs`, {
@@ -157,9 +171,8 @@ export function NewStaff({
         CheckApiResponse(data, data.json());
       });
 
-      let newItem = JSON.parse(bodyContent)
-      UpdateAddState(selectedStaffList,setSelectedStaffList,newItem)
-      
+      let newItem = JSON.parse(bodyContent);
+      UpdateAddState(selectedStaffList, setSelectedStaffList, newItem);
     }
   }
 
@@ -226,18 +239,21 @@ export function NewStaff({
       </div>
       <div className="form-group">
         <label for="branch">Branch:</label>
-        <input
-          type="text"
-          className="form-control password"
-          id="branch"
-          placeholder="Branch"
-          name="branch"
-          required
-          oninvalid="input_error('branch')"
-          onChange={(e) => {
-            setBranch(e.target.value);
+
+        <select
+          onChange={(event) => {
+            setBranch(event.target.value);
           }}
-        />
+          className="ms-3"
+        >
+          <option disabled={false} value="">
+            No Selection
+          </option>
+          {branches.map((branch) => {
+            return <option value={branch.id}>{branch.name}</option>;
+          })}
+        </select>
+
         <div id="passwordError" className="errorOutput"></div>
       </div>
       <div className="form-group">
@@ -287,8 +303,7 @@ export function NewStaff({
   );
 }
 
-export function DeleteStaff(delId,selectedStaffList,
-  setSelectedStaffList) {
+export function DeleteStaff(delId, selectedStaffList, setSelectedStaffList) {
   let confirmation = window.confirm('you sure you want to delete the staff');
 
   if (confirmation) {
@@ -298,17 +313,15 @@ export function DeleteStaff(delId,selectedStaffList,
       resp.json();
     });
 
-    UpdateRemoveState(delId,selectedStaffList,setSelectedStaffList)
-
-   
-
+    UpdateRemoveState(delId, selectedStaffList, setSelectedStaffList);
   }
 }
 
 export function EditStaff({
   staffList,
   selectedStaffList,
-  setSelectedStaffList
+  setSelectedStaffList,
+  branches,
 }) {
   const location = useLocation();
   const { item } = location.state;
@@ -323,6 +336,7 @@ export function EditStaff({
   const [confirmPsdd, setconfirmPsdd] = useState(item.passwordHash);
 
   const [branch, setBranch] = useState(item.branch);
+  const [currentBranch, setCurrentBranch] = useState('Loading...');
 
   function editStaffAction() {
     if (confirmPsdd != passwordHash) {
@@ -357,12 +371,18 @@ export function EditStaff({
         CheckApiResponse(data, data.json());
       });
 
-      let editItem = JSON.parse(bodyContent)
+      let editItem = JSON.parse(bodyContent);
 
-      UpdateEditState(id,selectedStaffList,setSelectedStaffList, editItem)
-  
+      UpdateEditState(id, selectedStaffList, setSelectedStaffList, editItem);
     }
   }
+
+  branches.forEach((branch) => {
+    if (branch.id == item.branch) {
+      alert('found');
+      setCurrentBranch(branch.name);
+    }
+  });
   return (
     <form
       className="form"
@@ -427,19 +447,23 @@ export function EditStaff({
 
       <div className="form-group">
         <label for="branch">Branch:</label>
-        <input
-          type="text"
-          className="form-control tel"
-          id="branch"
-          placeholder="Branch"
-          name="branch"
-          oninvalid="input_error('branch')"
-          onChange={(e) => {
-            setBranch(e.target.value);
+
+        <select
+          onChange={(event) => {
+            setBranch(event.target.value);
           }}
-          value={branch}
-        />
-        <div id="phoneError" className="errorOutput"></div>
+          className="ms-3"
+        >
+          <option disabled={false} value="">
+            {currentBranch}
+          </option>
+
+          {branches.map((branch) => {
+            return <option value={branch.id}>{branch.name}</option>;
+          })}
+        </select>
+
+        <div id="passwordError" className="errorOutput"></div>
       </div>
 
       <div className="form-group">

@@ -86,7 +86,7 @@ export function ShowBranches({
                   <div className="row ">
                     <span>
                       <b>On Service : </b>
-                      {branch.onService}{' '}
+                      {branch.onService?"true":"false"}{' '}
                     </span>
                   </div>
                   <div className="row">
@@ -326,7 +326,7 @@ export function EditBranch({
       </div>
       <div className="form-group">
         <label for="onService" className="pe-4 align-middle">
-          On Service: ({onService})
+          On Service: ({onService?"true":"false"})
         </label>
         <label>
           True
